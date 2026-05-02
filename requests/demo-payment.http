@@ -1,0 +1,59 @@
+### Demo Payment Service health
+GET http://localhost:8090/actuator/health
+
+
+### Current failure mode
+GET http://localhost:8090/simulate/failure-mode
+
+
+### Set HIGH_LATENCY mode
+POST http://localhost:8090/simulate/failure-mode
+Content-Type: application/json
+
+{
+  "mode": "HIGH_LATENCY",
+  "latencyMs": 2500,
+  "failureRate": 0.0
+}
+
+
+### Set RANDOM_FAILURES mode
+POST http://localhost:8090/simulate/failure-mode
+Content-Type: application/json
+
+{
+  "mode": "RANDOM_FAILURES",
+  "latencyMs": 0,
+  "failureRate": 1.0
+}
+
+
+### Set TIMEOUTS mode
+POST http://localhost:8090/simulate/failure-mode
+Content-Type: application/json
+
+{
+  "mode": "TIMEOUTS",
+  "latencyMs": 3000,
+  "failureRate": 0.0
+}
+
+
+### Recover payment service
+POST http://localhost:8090/simulate/recovery
+
+
+### Charge payment
+POST http://localhost:8090/payments/charge
+Content-Type: application/json
+
+{
+  "customerId": "customer-123",
+  "amount": 49.99,
+  "currency": "EUR",
+  "correlationId": "checkout-req-001"
+}
+
+
+### Check IncidentHub signals
+GET http://localhost:8080/signals?limit=10
