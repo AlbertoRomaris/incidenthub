@@ -1,0 +1,22 @@
+### Ingest ERROR signal
+POST http://localhost:8080/signals
+Content-Type: application/json
+
+{
+  "serviceName": "payment-service",
+  "environment": "local",
+  "signalType": "ERROR",
+  "severity": "HIGH",
+  "message": "Payment provider timeout",
+  "correlationId": "req-123",
+  "traceId": "trace-123",
+  "spanId": "span-123",
+  "latencyMs": 2400,
+  "statusCode": 504,
+  "errorCode": "PAYMENT_TIMEOUT",
+  "timestamp": "2026-05-02T10:15:00Z",
+  "attributes": {
+    "provider": "mock-payment-provider",
+    "endpoint": "/payments/charge"
+  }
+}
