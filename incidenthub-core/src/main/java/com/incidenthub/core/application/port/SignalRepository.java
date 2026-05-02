@@ -2,7 +2,9 @@ package com.incidenthub.core.application.port;
 
 import com.incidenthub.core.domain.signal.Signal;
 import com.incidenthub.core.domain.signal.SignalId;
+import com.incidenthub.core.domain.signal.SignalType;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +15,11 @@ public interface SignalRepository {
     Optional<Signal> findById(SignalId signalId);
 
     List<Signal> findRecent(int limit);
+
+    List<Signal> findByServiceAndTypeSince(
+            String serviceName,
+            SignalType signalType,
+            Instant since,
+            int limit
+    );
 }

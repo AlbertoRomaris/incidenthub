@@ -3,10 +3,12 @@ package com.incidenthub.infrastructure.persistence.signal;
 import com.incidenthub.core.application.port.SignalRepository;
 import com.incidenthub.core.domain.signal.Signal;
 import com.incidenthub.core.domain.signal.SignalId;
+import com.incidenthub.core.domain.signal.SignalType;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,6 +42,31 @@ public class JpaSignalRepository implements SignalRepository {
         );
 
         return springDataSignalRepository.findAll(pageRequest)
+                .stream()
+                .map(SignalEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Signal> findByServiceAndTypeSince(
+            String serviceName,
+            SignalType signalType,
+            Instant since,
+            int limit
+    ) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                limit,
+                Sort.by(Sort.Direction.DESC, "observedAt")
+        );
+
+        return springDataSignalRepository
+                .findByServiceNameAndTypeAndObservedAtGreaterThanEqual(
+                        serviceName,
+                        signalType,
+                        since,
+                        pageRequest
+                )
                 .stream()
                 .map(SignalEntity::toDomain)
                 .toList();
