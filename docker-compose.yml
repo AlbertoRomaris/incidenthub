@@ -1,0 +1,50 @@
+# Implicit Docker Compose version
+# Defines WHAT services exist in this local development environment
+services:
+
+  # PostgreSQL database used by IncidentHub
+  postgres:
+
+    # Official PostgreSQL image, version 16
+    # Using explicit versions avoids unexpected upgrades
+    image: postgres:16
+
+    # Fixed container name
+    # Useful for logs, debugging and docker commands
+    container_name: incidenthub-postgres
+
+    # Environment variables used by Postgres at startup
+    environment:
+      # Name of the database that is automatically created
+      POSTGRES_DB: incidenthub
+
+      # Database user used by the application
+      POSTGRES_USER: incidenthub
+
+      # Local development password
+      # Never reuse this kind of password in real environments
+      POSTGRES_PASSWORD: incidenthub
+
+    # Port mapping
+    # host_port:container_port
+    #
+    # We use 5434 locally to avoid conflicts with other projects
+    ports:
+      - "5434:5432"
+
+    # Volumes = data persistence
+    # Even if the container is removed, database data is preserved
+    volumes:
+      - incidenthub_pgdata:/var/lib/postgresql/data
+
+    # Healthcheck: Docker checks if Postgres is ready
+    # This is useful before starting application services
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U incidenthub -d incidenthub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+# Definition of persistent volumes
+volumes:
+  incidenthub_pgdata:
