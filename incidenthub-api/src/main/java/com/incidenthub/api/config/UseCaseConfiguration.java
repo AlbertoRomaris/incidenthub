@@ -1,5 +1,6 @@
 package com.incidenthub.api.config;
 
+import com.incidenthub.core.application.port.SignalProcessingTaskRepository;
 import com.incidenthub.core.application.port.SignalRepository;
 import com.incidenthub.core.application.usecase.GetSignalByIdUseCase;
 import com.incidenthub.core.application.usecase.IngestSignalUseCase;
@@ -20,9 +21,14 @@ public class UseCaseConfiguration {
     @Bean
     public IngestSignalUseCase ingestSignalUseCase(
             SignalRepository signalRepository,
+            SignalProcessingTaskRepository signalProcessingTaskRepository,
             Clock clock
     ) {
-        return new IngestSignalUseCase(signalRepository, clock);
+        return new IngestSignalUseCase(
+                signalRepository,
+                signalProcessingTaskRepository,
+                clock
+        );
     }
 
     @Bean

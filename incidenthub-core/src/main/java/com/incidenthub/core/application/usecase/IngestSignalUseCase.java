@@ -2,6 +2,7 @@ package com.incidenthub.core.application.usecase;
 
 import com.incidenthub.core.application.model.IngestSignalCommand;
 import com.incidenthub.core.application.model.IngestSignalResult;
+import com.incidenthub.core.application.port.SignalProcessingTaskRepository;
 import com.incidenthub.core.application.port.SignalRepository;
 import com.incidenthub.core.domain.signal.Signal;
 
@@ -12,10 +13,16 @@ import java.util.Objects;
 public class IngestSignalUseCase {
 
     private final SignalRepository signalRepository;
+    private final SignalProcessingTaskRepository signalProcessingTaskRepository;
     private final Clock clock;
 
-    public IngestSignalUseCase(SignalRepository signalRepository, Clock clock) {
+    public IngestSignalUseCase(
+            SignalRepository signalRepository,
+            SignalProcessingTaskRepository signalProcessingTaskRepository,
+            Clock clock
+    ) {
         this.signalRepository = Objects.requireNonNull(signalRepository, "Signal repository must not be null");
+        this.signalProcessingTaskRepository = Objects.requireNonNull(signalProcessingTaskRepository, "Signal processing task repository must not be null");
         this.clock = Objects.requireNonNull(clock, "Clock must not be null");
     }
 
@@ -45,6 +52,11 @@ public class IngestSignalUseCase {
         );
 
         Signal savedSignal = signalRepository.save(signal);
+
+        signalProcessingTaskRepository.createPending(
+                savedSignal.id(),
+                receivedAt
+        );
 
         return IngestSignalResult.accepted(savedSignal.id());
     }
