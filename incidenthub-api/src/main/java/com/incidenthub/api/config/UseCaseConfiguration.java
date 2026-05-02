@@ -1,7 +1,9 @@
 package com.incidenthub.api.config;
 
 import com.incidenthub.core.application.port.SignalRepository;
+import com.incidenthub.core.application.usecase.GetSignalByIdUseCase;
 import com.incidenthub.core.application.usecase.IngestSignalUseCase;
+import com.incidenthub.core.application.usecase.ListRecentSignalsUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,5 +23,15 @@ public class UseCaseConfiguration {
             Clock clock
     ) {
         return new IngestSignalUseCase(signalRepository, clock);
+    }
+
+    @Bean
+    public GetSignalByIdUseCase getSignalByIdUseCase(SignalRepository signalRepository) {
+        return new GetSignalByIdUseCase(signalRepository);
+    }
+
+    @Bean
+    public ListRecentSignalsUseCase listRecentSignalsUseCase(SignalRepository signalRepository) {
+        return new ListRecentSignalsUseCase(signalRepository);
     }
 }

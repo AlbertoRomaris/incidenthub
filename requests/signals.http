@@ -20,3 +20,10 @@ Content-Type: application/json
     "endpoint": "/payments/charge"
   }
 }
+
+### List recent signals
+GET http://localhost:8080/signals?limit=10
+
+
+### Get signal by id
+GET http://localhost:8080/signals/8a53a039-cfcb-49ab-a2d3-73fd3b6c8997
