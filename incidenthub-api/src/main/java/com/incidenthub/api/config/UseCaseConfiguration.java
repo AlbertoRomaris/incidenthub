@@ -89,4 +89,11 @@ public class UseCaseConfiguration {
     public GetRuleByIdUseCase getRuleByIdUseCase(RuleRepository ruleRepository) {
         return new GetRuleByIdUseCase(ruleRepository);
     }
+
+    @Bean
+    public ListIncidentTimelineUseCase listIncidentTimelineUseCase(
+            IncidentTimelineRepository incidentTimelineRepository
+    ) {
+        return new ListIncidentTimelineUseCase(incidentTimelineRepository);
+    }
 }

@@ -30,3 +30,6 @@ GET http://localhost:8080/incidents?status=ACKNOWLEDGED&limit=10
 
 ### List resolved incidents
 GET http://localhost:8080/incidents?status=RESOLVED&limit=10
+
+### Get incident timeline
+GET http://localhost:8080/incidents/<INCIDENT_ID>/timeline

@@ -2,18 +2,16 @@ package com.incidenthub.api.controller;
 
 import com.incidenthub.api.dto.incident.IncidentEvidenceResponse;
 import com.incidenthub.api.dto.incident.IncidentResponse;
-import com.incidenthub.core.application.usecase.GetIncidentByIdUseCase;
-import com.incidenthub.core.application.usecase.ListIncidentEvidenceUseCase;
-import com.incidenthub.core.application.usecase.ListIncidentsUseCase;
+import com.incidenthub.api.dto.incident.IncidentTimelineEventResponse;
+import com.incidenthub.core.application.usecase.*;
 import com.incidenthub.core.domain.incident.IncidentStatus;
 import com.incidenthub.core.domain.evidence.IncidentEvidence;
 import com.incidenthub.core.domain.incident.Incident;
 import com.incidenthub.core.domain.incident.IncidentId;
+import com.incidenthub.core.domain.timeline.IncidentTimelineEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import com.incidenthub.core.application.usecase.AcknowledgeIncidentUseCase;
-import com.incidenthub.core.application.usecase.ResolveIncidentUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,19 +25,22 @@ public class IncidentController {
     private final ListIncidentEvidenceUseCase listIncidentEvidenceUseCase;
     private final AcknowledgeIncidentUseCase acknowledgeIncidentUseCase;
     private final ResolveIncidentUseCase resolveIncidentUseCase;
+    private final ListIncidentTimelineUseCase listIncidentTimelineUseCase;
 
     public IncidentController(
             GetIncidentByIdUseCase getIncidentByIdUseCase,
             ListIncidentsUseCase listIncidentsUseCase,
             ListIncidentEvidenceUseCase listIncidentEvidenceUseCase,
             AcknowledgeIncidentUseCase acknowledgeIncidentUseCase,
-            ResolveIncidentUseCase resolveIncidentUseCase
+            ResolveIncidentUseCase resolveIncidentUseCase,
+            ListIncidentTimelineUseCase listIncidentTimelineUseCase
     ) {
         this.getIncidentByIdUseCase = getIncidentByIdUseCase;
         this.listIncidentsUseCase = listIncidentsUseCase;
         this.listIncidentEvidenceUseCase = listIncidentEvidenceUseCase;
         this.acknowledgeIncidentUseCase = acknowledgeIncidentUseCase;
         this.resolveIncidentUseCase = resolveIncidentUseCase;
+        this.listIncidentTimelineUseCase = listIncidentTimelineUseCase;
     }
 
     @GetMapping
@@ -93,6 +94,14 @@ public class IncidentController {
         }
     }
 
+    @GetMapping("/{incidentId}/timeline")
+    public List<IncidentTimelineEventResponse> getIncidentTimeline(@PathVariable("incidentId") UUID incidentId) {
+        return listIncidentTimelineUseCase.findByIncidentId(IncidentId.from(incidentId))
+                .stream()
+                .map(this::toTimelineResponse)
+                .toList();
+    }
+
     private IncidentResponse toResponse(Incident incident) {
         return new IncidentResponse(
                 incident.id().value().toString(),
@@ -122,6 +131,18 @@ public class IncidentController {
                 evidence.capturedAt(),
                 evidence.summary(),
                 evidence.attributes()
+        );
+    }
+
+    private IncidentTimelineEventResponse toTimelineResponse(IncidentTimelineEvent event) {
+        return new IncidentTimelineEventResponse(
+                event.id().value().toString(),
+                event.incidentId().value().toString(),
+                event.type(),
+                event.occurredAt(),
+                event.summary(),
+                event.actor(),
+                event.attributes()
         );
     }
 }
