@@ -96,4 +96,9 @@ public class UseCaseConfiguration {
     ) {
         return new ListIncidentTimelineUseCase(incidentTimelineRepository);
     }
+
+    @Bean
+    public ListIncidentAlertsUseCase listIncidentAlertsUseCase(AlertRepository alertRepository) {
+        return new ListIncidentAlertsUseCase(alertRepository);
+    }
 }

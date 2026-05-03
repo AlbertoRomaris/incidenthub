@@ -27,6 +27,9 @@ GET http://localhost:8080/incidents?status=OPEN&limit=10
 ### List acknowledged incidents
 GET http://localhost:8080/incidents?status=ACKNOWLEDGED&limit=10
 
+### Get incident alerts
+GET http://localhost:8080/incidents/c5cb2bac-efdd-46de-a6a7-79d053b54be0/alerts
+
 
 ### List resolved incidents
 GET http://localhost:8080/incidents?status=RESOLVED&limit=10

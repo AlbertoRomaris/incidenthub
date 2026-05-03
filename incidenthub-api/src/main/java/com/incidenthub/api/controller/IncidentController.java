@@ -12,6 +12,9 @@ import com.incidenthub.core.domain.timeline.IncidentTimelineEvent;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.incidenthub.api.dto.incident.IncidentAlertResponse;
+import com.incidenthub.core.application.usecase.ListIncidentAlertsUseCase;
+import com.incidenthub.core.domain.alert.Alert;
 
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +29,7 @@ public class IncidentController {
     private final AcknowledgeIncidentUseCase acknowledgeIncidentUseCase;
     private final ResolveIncidentUseCase resolveIncidentUseCase;
     private final ListIncidentTimelineUseCase listIncidentTimelineUseCase;
+    private final ListIncidentAlertsUseCase listIncidentAlertsUseCase;
 
     public IncidentController(
             GetIncidentByIdUseCase getIncidentByIdUseCase,
@@ -33,7 +37,8 @@ public class IncidentController {
             ListIncidentEvidenceUseCase listIncidentEvidenceUseCase,
             AcknowledgeIncidentUseCase acknowledgeIncidentUseCase,
             ResolveIncidentUseCase resolveIncidentUseCase,
-            ListIncidentTimelineUseCase listIncidentTimelineUseCase
+            ListIncidentTimelineUseCase listIncidentTimelineUseCase,
+            ListIncidentAlertsUseCase listIncidentAlertsUseCase
     ) {
         this.getIncidentByIdUseCase = getIncidentByIdUseCase;
         this.listIncidentsUseCase = listIncidentsUseCase;
@@ -41,6 +46,7 @@ public class IncidentController {
         this.acknowledgeIncidentUseCase = acknowledgeIncidentUseCase;
         this.resolveIncidentUseCase = resolveIncidentUseCase;
         this.listIncidentTimelineUseCase = listIncidentTimelineUseCase;
+        this.listIncidentAlertsUseCase = listIncidentAlertsUseCase;
     }
 
     @GetMapping
@@ -102,6 +108,14 @@ public class IncidentController {
                 .toList();
     }
 
+    @GetMapping("/{incidentId}/alerts")
+    public List<IncidentAlertResponse> getIncidentAlerts(@PathVariable("incidentId") UUID incidentId) {
+        return listIncidentAlertsUseCase.findByIncidentId(IncidentId.from(incidentId))
+                .stream()
+                .map(this::toAlertResponse)
+                .toList();
+    }
+
     private IncidentResponse toResponse(Incident incident) {
         return new IncidentResponse(
                 incident.id().value().toString(),
@@ -143,6 +157,22 @@ public class IncidentController {
                 event.summary(),
                 event.actor(),
                 event.attributes()
+        );
+    }
+
+    private IncidentAlertResponse toAlertResponse(Alert alert) {
+        return new IncidentAlertResponse(
+                alert.id().value().toString(),
+                alert.incidentId().value().toString(),
+                alert.channel(),
+                alert.status(),
+                alert.title(),
+                alert.message(),
+                alert.createdAt(),
+                alert.sentAt(),
+                alert.failedAt(),
+                alert.failureReason(),
+                alert.attributes()
         );
     }
 }
