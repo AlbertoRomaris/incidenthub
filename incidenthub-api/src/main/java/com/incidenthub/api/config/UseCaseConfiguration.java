@@ -4,7 +4,6 @@ import com.incidenthub.core.application.port.*;
 import com.incidenthub.core.application.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import java.time.Clock;
 
 @Configuration
@@ -58,17 +57,27 @@ public class UseCaseConfiguration {
     @Bean
     public AcknowledgeIncidentUseCase acknowledgeIncidentUseCase(
             IncidentRepository incidentRepository,
+            IncidentTimelineRepository incidentTimelineRepository,
             Clock clock
     ) {
-        return new AcknowledgeIncidentUseCase(incidentRepository, clock);
+        return new AcknowledgeIncidentUseCase(
+                incidentRepository,
+                incidentTimelineRepository,
+                clock
+        );
     }
 
     @Bean
     public ResolveIncidentUseCase resolveIncidentUseCase(
             IncidentRepository incidentRepository,
+            IncidentTimelineRepository incidentTimelineRepository,
             Clock clock
     ) {
-        return new ResolveIncidentUseCase(incidentRepository, clock);
+        return new ResolveIncidentUseCase(
+                incidentRepository,
+                incidentTimelineRepository,
+                clock
+        );
     }
 
     @Bean

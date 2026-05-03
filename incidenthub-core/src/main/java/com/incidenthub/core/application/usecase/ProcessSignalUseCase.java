@@ -3,6 +3,7 @@ package com.incidenthub.core.application.usecase;
 import com.incidenthub.core.application.model.ProcessSignalResult;
 import com.incidenthub.core.application.port.IncidentEvidenceRepository;
 import com.incidenthub.core.application.port.IncidentRepository;
+import com.incidenthub.core.application.port.IncidentTimelineRepository;
 import com.incidenthub.core.application.port.RuleRepository;
 import com.incidenthub.core.application.port.SignalRepository;
 import com.incidenthub.core.domain.evidence.IncidentEvidence;
@@ -12,8 +13,11 @@ import com.incidenthub.core.domain.incident.IncidentId;
 import com.incidenthub.core.domain.rule.Rule;
 import com.incidenthub.core.domain.rule.RuleConditionType;
 import com.incidenthub.core.domain.rule.RuleEvaluationResult;
+import com.incidenthub.core.domain.runbook.RunbookReference;
 import com.incidenthub.core.domain.signal.Signal;
 import com.incidenthub.core.domain.signal.SignalId;
+import com.incidenthub.core.domain.timeline.IncidentTimelineEvent;
+import com.incidenthub.core.domain.timeline.IncidentTimelineEventType;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -28,6 +32,7 @@ public class ProcessSignalUseCase {
     private final RuleRepository ruleRepository;
     private final IncidentRepository incidentRepository;
     private final IncidentEvidenceRepository incidentEvidenceRepository;
+    private final IncidentTimelineRepository incidentTimelineRepository;
     private final Clock clock;
 
     public ProcessSignalUseCase(
@@ -35,12 +40,14 @@ public class ProcessSignalUseCase {
             RuleRepository ruleRepository,
             IncidentRepository incidentRepository,
             IncidentEvidenceRepository incidentEvidenceRepository,
+            IncidentTimelineRepository incidentTimelineRepository,
             Clock clock
     ) {
         this.signalRepository = Objects.requireNonNull(signalRepository, "Signal repository must not be null");
         this.ruleRepository = Objects.requireNonNull(ruleRepository, "Rule repository must not be null");
         this.incidentRepository = Objects.requireNonNull(incidentRepository, "Incident repository must not be null");
         this.incidentEvidenceRepository = Objects.requireNonNull(incidentEvidenceRepository, "Incident evidence repository must not be null");
+        this.incidentTimelineRepository = Objects.requireNonNull(incidentTimelineRepository, "Incident timeline repository must not be null");
         this.clock = Objects.requireNonNull(clock, "Clock must not be null");
     }
 
@@ -70,8 +77,19 @@ public class ProcessSignalUseCase {
 
             matchedRules++;
 
-            Incident incident = openOrUpdateIncident(signal, rule, evaluationResult, evaluatedAt);
-            Incident savedIncident = incidentRepository.save(incident);
+            IncidentDecision incidentDecision = openOrUpdateIncident(
+                    signal,
+                    rule,
+                    evaluationResult,
+                    evaluatedAt
+            );
+
+            Incident savedIncident = incidentRepository.save(incidentDecision.incident());
+
+            if (incidentDecision.newIncident()) {
+                recordIncidentOpened(savedIncident, rule, evaluationResult, evaluatedAt);
+                recordRunbookIfAvailable(savedIncident, evaluatedAt);
+            }
 
             IncidentEvidence evidence = createEvidence(
                     savedIncident,
@@ -81,7 +99,8 @@ public class ProcessSignalUseCase {
                     evaluatedAt
             );
 
-            incidentEvidenceRepository.save(evidence);
+            IncidentEvidence savedEvidence = incidentEvidenceRepository.save(evidence);
+            recordEvidenceAttached(savedIncident, savedEvidence, rule, evaluatedAt);
 
             affectedIncidents.add(savedIncident.id());
         }
@@ -136,7 +155,7 @@ public class ProcessSignalUseCase {
         );
     }
 
-    private Incident openOrUpdateIncident(
+    private IncidentDecision openOrUpdateIncident(
             Signal signal,
             Rule rule,
             RuleEvaluationResult evaluationResult,
@@ -149,15 +168,21 @@ public class ProcessSignalUseCase {
         );
 
         return incidentRepository.findActiveByDeduplicationKey(deduplicationKey)
-                .map(existingIncident -> existingIncident.recordOccurrence(evaluatedAt))
-                .orElseGet(() -> Incident.open(
-                        signal.serviceName(),
-                        signal.environment(),
-                        rule.incidentType(),
-                        rule.incidentSeverity(),
-                        buildIncidentSummary(signal, rule),
-                        buildIncidentDescription(rule, evaluationResult),
-                        evaluatedAt
+                .map(existingIncident -> new IncidentDecision(
+                        existingIncident.recordOccurrence(evaluatedAt),
+                        false
+                ))
+                .orElseGet(() -> new IncidentDecision(
+                        Incident.open(
+                                signal.serviceName(),
+                                signal.environment(),
+                                rule.incidentType(),
+                                rule.incidentSeverity(),
+                                buildIncidentSummary(signal, rule),
+                                buildIncidentDescription(rule, evaluationResult),
+                                evaluatedAt
+                        ),
+                        true
                 ));
     }
 
@@ -186,6 +211,68 @@ public class ProcessSignalUseCase {
         );
     }
 
+    private void recordIncidentOpened(
+            Incident incident,
+            Rule rule,
+            RuleEvaluationResult evaluationResult,
+            Instant occurredAt
+    ) {
+        incidentTimelineRepository.save(IncidentTimelineEvent.record(
+                incident.id(),
+                IncidentTimelineEventType.INCIDENT_OPENED,
+                occurredAt,
+                "Incident opened by rule: " + rule.name(),
+                "worker",
+                Map.of(
+                        "ruleId", rule.id().value().toString(),
+                        "incidentType", incident.type().name(),
+                        "severity", incident.severity().name(),
+                        "matchingSignalsCount", evaluationResult.matchingSignalsCount(),
+                        "reason", evaluationResult.reason()
+                )
+        ));
+    }
+
+    private void recordRunbookIfAvailable(
+            Incident incident,
+            Instant occurredAt
+    ) {
+        RunbookReference.forIncidentType(incident.type())
+                .ifPresent(runbook -> incidentTimelineRepository.save(IncidentTimelineEvent.record(
+                        incident.id(),
+                        IncidentTimelineEventType.RUNBOOK_ATTACHED,
+                        occurredAt,
+                        "Runbook attached: " + runbook.title(),
+                        "system",
+                        Map.of(
+                                "incidentType", incident.type().name(),
+                                "title", runbook.title(),
+                                "documentPath", runbook.documentPath(),
+                                "summary", runbook.summary()
+                        )
+                )));
+    }
+
+    private void recordEvidenceAttached(
+            Incident incident,
+            IncidentEvidence evidence,
+            Rule rule,
+            Instant occurredAt
+    ) {
+        incidentTimelineRepository.save(IncidentTimelineEvent.record(
+                incident.id(),
+                IncidentTimelineEventType.EVIDENCE_ATTACHED,
+                occurredAt,
+                "Evidence attached from signal: " + evidence.signalId().value(),
+                "worker",
+                Map.of(
+                        "evidenceId", evidence.id().value().toString(),
+                        "signalId", evidence.signalId().value().toString(),
+                        "ruleId", rule.id().value().toString()
+                )
+        ));
+    }
+
     private String buildIncidentSummary(Signal signal, Rule rule) {
         return rule.incidentType().name() + " detected for " + signal.serviceName();
     }
@@ -197,5 +284,11 @@ public class ProcessSignalUseCase {
         return rule.description()
                 + " "
                 + evaluationResult.reason();
+    }
+
+    private record IncidentDecision(
+            Incident incident,
+            boolean newIncident
+    ) {
     }
 }
