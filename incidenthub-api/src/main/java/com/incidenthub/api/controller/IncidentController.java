@@ -11,6 +11,8 @@ import com.incidenthub.core.domain.incident.IncidentId;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.incidenthub.core.application.usecase.AcknowledgeIncidentUseCase;
+import com.incidenthub.core.application.usecase.ResolveIncidentUseCase;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,15 +24,21 @@ public class IncidentController {
     private final GetIncidentByIdUseCase getIncidentByIdUseCase;
     private final ListOpenIncidentsUseCase listOpenIncidentsUseCase;
     private final ListIncidentEvidenceUseCase listIncidentEvidenceUseCase;
+    private final AcknowledgeIncidentUseCase acknowledgeIncidentUseCase;
+    private final ResolveIncidentUseCase resolveIncidentUseCase;
 
     public IncidentController(
             GetIncidentByIdUseCase getIncidentByIdUseCase,
             ListOpenIncidentsUseCase listOpenIncidentsUseCase,
-            ListIncidentEvidenceUseCase listIncidentEvidenceUseCase
+            ListIncidentEvidenceUseCase listIncidentEvidenceUseCase,
+            AcknowledgeIncidentUseCase acknowledgeIncidentUseCase,
+            ResolveIncidentUseCase resolveIncidentUseCase
     ) {
         this.getIncidentByIdUseCase = getIncidentByIdUseCase;
         this.listOpenIncidentsUseCase = listOpenIncidentsUseCase;
         this.listIncidentEvidenceUseCase = listIncidentEvidenceUseCase;
+        this.acknowledgeIncidentUseCase = acknowledgeIncidentUseCase;
+        this.resolveIncidentUseCase = resolveIncidentUseCase;
     }
 
     @GetMapping
@@ -57,6 +65,30 @@ public class IncidentController {
                 .stream()
                 .map(this::toEvidenceResponse)
                 .toList();
+    }
+
+    @PostMapping("/{incidentId}/acknowledge")
+    public IncidentResponse acknowledgeIncident(@PathVariable("incidentId") UUID incidentId) {
+        try {
+            Incident incident = acknowledgeIncidentUseCase.acknowledge(IncidentId.from(incidentId))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Incident not found"));
+
+            return toResponse(incident);
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+        }
+    }
+
+    @PostMapping("/{incidentId}/resolve")
+    public IncidentResponse resolveIncident(@PathVariable("incidentId") UUID incidentId) {
+        try {
+            Incident incident = resolveIncidentUseCase.resolve(IncidentId.from(incidentId))
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Incident not found"));
+
+            return toResponse(incident);
+        } catch (IllegalStateException exception) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, exception.getMessage());
+        }
     }
 
     private IncidentResponse toResponse(Incident incident) {

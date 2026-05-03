@@ -12,6 +12,8 @@ import com.incidenthub.core.application.port.IncidentRepository;
 import com.incidenthub.core.application.usecase.GetIncidentByIdUseCase;
 import com.incidenthub.core.application.usecase.ListIncidentEvidenceUseCase;
 import com.incidenthub.core.application.usecase.ListOpenIncidentsUseCase;
+import com.incidenthub.core.application.usecase.AcknowledgeIncidentUseCase;
+import com.incidenthub.core.application.usecase.ResolveIncidentUseCase;
 
 import java.time.Clock;
 
@@ -61,5 +63,21 @@ public class UseCaseConfiguration {
             IncidentEvidenceRepository incidentEvidenceRepository
     ) {
         return new ListIncidentEvidenceUseCase(incidentEvidenceRepository);
+    }
+
+    @Bean
+    public AcknowledgeIncidentUseCase acknowledgeIncidentUseCase(
+            IncidentRepository incidentRepository,
+            Clock clock
+    ) {
+        return new AcknowledgeIncidentUseCase(incidentRepository, clock);
+    }
+
+    @Bean
+    public ResolveIncidentUseCase resolveIncidentUseCase(
+            IncidentRepository incidentRepository,
+            Clock clock
+    ) {
+        return new ResolveIncidentUseCase(incidentRepository, clock);
     }
 }
