@@ -1,19 +1,9 @@
 package com.incidenthub.api.config;
 
-import com.incidenthub.core.application.port.SignalProcessingTaskRepository;
-import com.incidenthub.core.application.port.SignalRepository;
-import com.incidenthub.core.application.usecase.GetSignalByIdUseCase;
-import com.incidenthub.core.application.usecase.IngestSignalUseCase;
-import com.incidenthub.core.application.usecase.ListRecentSignalsUseCase;
+import com.incidenthub.core.application.port.*;
+import com.incidenthub.core.application.usecase.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import com.incidenthub.core.application.port.IncidentEvidenceRepository;
-import com.incidenthub.core.application.port.IncidentRepository;
-import com.incidenthub.core.application.usecase.GetIncidentByIdUseCase;
-import com.incidenthub.core.application.usecase.ListIncidentEvidenceUseCase;
-import com.incidenthub.core.application.usecase.ListIncidentsUseCase;
-import com.incidenthub.core.application.usecase.AcknowledgeIncidentUseCase;
-import com.incidenthub.core.application.usecase.ResolveIncidentUseCase;
 
 import java.time.Clock;
 
@@ -79,5 +69,15 @@ public class UseCaseConfiguration {
             Clock clock
     ) {
         return new ResolveIncidentUseCase(incidentRepository, clock);
+    }
+
+    @Bean
+    public ListEnabledRulesUseCase listEnabledRulesUseCase(RuleRepository ruleRepository) {
+        return new ListEnabledRulesUseCase(ruleRepository);
+    }
+
+    @Bean
+    public GetRuleByIdUseCase getRuleByIdUseCase(RuleRepository ruleRepository) {
+        return new GetRuleByIdUseCase(ruleRepository);
     }
 }

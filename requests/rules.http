@@ -1,0 +1,6 @@
+### List enabled rules
+GET http://localhost:8080/rules
+
+
+### Get high latency rule by id
+GET http://localhost:8080/rules/22222222-2222-2222-2222-222222222222
