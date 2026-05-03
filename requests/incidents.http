@@ -1,0 +1,10 @@
+### List open incidents
+GET http://localhost:8080/incidents?limit=10
+
+
+### Get incident by id
+GET http://localhost:8080/incidents/f81c4ce8-2cff-44c1-aceb-7e2a9450e8c1
+
+
+### Get incident evidence
+GET http://localhost:8080/incidents/f81c4ce8-2cff-44c1-aceb-7e2a9450e8c1/evidence

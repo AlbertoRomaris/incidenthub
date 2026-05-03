@@ -7,6 +7,11 @@ import com.incidenthub.core.application.usecase.IngestSignalUseCase;
 import com.incidenthub.core.application.usecase.ListRecentSignalsUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import com.incidenthub.core.application.port.IncidentEvidenceRepository;
+import com.incidenthub.core.application.port.IncidentRepository;
+import com.incidenthub.core.application.usecase.GetIncidentByIdUseCase;
+import com.incidenthub.core.application.usecase.ListIncidentEvidenceUseCase;
+import com.incidenthub.core.application.usecase.ListOpenIncidentsUseCase;
 
 import java.time.Clock;
 
@@ -39,5 +44,22 @@ public class UseCaseConfiguration {
     @Bean
     public ListRecentSignalsUseCase listRecentSignalsUseCase(SignalRepository signalRepository) {
         return new ListRecentSignalsUseCase(signalRepository);
+    }
+
+    @Bean
+    public GetIncidentByIdUseCase getIncidentByIdUseCase(IncidentRepository incidentRepository) {
+        return new GetIncidentByIdUseCase(incidentRepository);
+    }
+
+    @Bean
+    public ListOpenIncidentsUseCase listOpenIncidentsUseCase(IncidentRepository incidentRepository) {
+        return new ListOpenIncidentsUseCase(incidentRepository);
+    }
+
+    @Bean
+    public ListIncidentEvidenceUseCase listIncidentEvidenceUseCase(
+            IncidentEvidenceRepository incidentEvidenceRepository
+    ) {
+        return new ListIncidentEvidenceUseCase(incidentEvidenceRepository);
     }
 }
