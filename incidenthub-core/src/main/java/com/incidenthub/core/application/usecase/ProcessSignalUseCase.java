@@ -18,6 +18,9 @@ import com.incidenthub.core.domain.signal.Signal;
 import com.incidenthub.core.domain.signal.SignalId;
 import com.incidenthub.core.domain.timeline.IncidentTimelineEvent;
 import com.incidenthub.core.domain.timeline.IncidentTimelineEventType;
+import com.incidenthub.core.application.port.AlertRepository;
+import com.incidenthub.core.domain.alert.Alert;
+import com.incidenthub.core.domain.alert.AlertChannel;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -34,6 +37,7 @@ public class ProcessSignalUseCase {
     private final IncidentEvidenceRepository incidentEvidenceRepository;
     private final IncidentTimelineRepository incidentTimelineRepository;
     private final Clock clock;
+    private final AlertRepository alertRepository;
 
     public ProcessSignalUseCase(
             SignalRepository signalRepository,
@@ -41,6 +45,7 @@ public class ProcessSignalUseCase {
             IncidentRepository incidentRepository,
             IncidentEvidenceRepository incidentEvidenceRepository,
             IncidentTimelineRepository incidentTimelineRepository,
+            AlertRepository alertRepository,
             Clock clock
     ) {
         this.signalRepository = Objects.requireNonNull(signalRepository, "Signal repository must not be null");
@@ -48,6 +53,7 @@ public class ProcessSignalUseCase {
         this.incidentRepository = Objects.requireNonNull(incidentRepository, "Incident repository must not be null");
         this.incidentEvidenceRepository = Objects.requireNonNull(incidentEvidenceRepository, "Incident evidence repository must not be null");
         this.incidentTimelineRepository = Objects.requireNonNull(incidentTimelineRepository, "Incident timeline repository must not be null");
+        this.alertRepository = Objects.requireNonNull(alertRepository, "Alert repository must not be null");
         this.clock = Objects.requireNonNull(clock, "Clock must not be null");
     }
 
@@ -89,6 +95,7 @@ public class ProcessSignalUseCase {
             if (incidentDecision.newIncident()) {
                 recordIncidentOpened(savedIncident, rule, evaluationResult, evaluatedAt);
                 recordRunbookIfAvailable(savedIncident, evaluatedAt);
+                createAlertRequest(savedIncident, rule, evaluationResult, evaluatedAt);
             }
 
             IncidentEvidence evidence = createEvidence(
@@ -271,6 +278,62 @@ public class ProcessSignalUseCase {
                         "ruleId", rule.id().value().toString()
                 )
         ));
+    }
+
+    private void createAlertRequest(
+            Incident incident,
+            Rule rule,
+            RuleEvaluationResult evaluationResult,
+            Instant createdAt
+    ) {
+        Alert alert = Alert.pending(
+                incident.id(),
+                AlertChannel.LOG,
+                "Incident opened: " + incident.summary(),
+                buildAlertMessage(incident, rule, evaluationResult),
+                createdAt,
+                Map.of(
+                        "incidentType", incident.type().name(),
+                        "severity", incident.severity().name(),
+                        "serviceName", incident.serviceName(),
+                        "environment", incident.environment(),
+                        "ruleId", rule.id().value().toString(),
+                        "ruleName", rule.name(),
+                        "matchingSignalsCount", evaluationResult.matchingSignalsCount()
+                )
+        );
+
+        Alert savedAlert = alertRepository.save(alert);
+
+        incidentTimelineRepository.save(IncidentTimelineEvent.record(
+                incident.id(),
+                IncidentTimelineEventType.ALERT_REQUESTED,
+                createdAt,
+                "Alert requested for incident: " + incident.summary(),
+                "system",
+                Map.of(
+                        "alertId", savedAlert.id().value().toString(),
+                        "channel", savedAlert.channel().name(),
+                        "status", savedAlert.status().name()
+                )
+        ));
+    }
+
+    private String buildAlertMessage(
+            Incident incident,
+            Rule rule,
+            RuleEvaluationResult evaluationResult
+    ) {
+        return "Incident "
+                + incident.type().name()
+                + " detected for service "
+                + incident.serviceName()
+                + " in environment "
+                + incident.environment()
+                + ". Rule: "
+                + rule.name()
+                + ". "
+                + evaluationResult.reason();
     }
 
     private String buildIncidentSummary(Signal signal, Rule rule) {
