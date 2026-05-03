@@ -10,3 +10,9 @@ management:
     web:
       exposure:
         include: health,info
+
+incidenthub:
+  worker:
+    id: local-worker-1
+    batch-size: 10
+    poll-delay-ms: 5000
