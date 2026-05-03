@@ -11,7 +11,7 @@ import com.incidenthub.core.application.port.IncidentEvidenceRepository;
 import com.incidenthub.core.application.port.IncidentRepository;
 import com.incidenthub.core.application.usecase.GetIncidentByIdUseCase;
 import com.incidenthub.core.application.usecase.ListIncidentEvidenceUseCase;
-import com.incidenthub.core.application.usecase.ListOpenIncidentsUseCase;
+import com.incidenthub.core.application.usecase.ListIncidentsUseCase;
 import com.incidenthub.core.application.usecase.AcknowledgeIncidentUseCase;
 import com.incidenthub.core.application.usecase.ResolveIncidentUseCase;
 
@@ -54,8 +54,8 @@ public class UseCaseConfiguration {
     }
 
     @Bean
-    public ListOpenIncidentsUseCase listOpenIncidentsUseCase(IncidentRepository incidentRepository) {
-        return new ListOpenIncidentsUseCase(incidentRepository);
+    public ListIncidentsUseCase listIncidentsUseCase(IncidentRepository incidentRepository) {
+        return new ListIncidentsUseCase(incidentRepository);
     }
 
     @Bean

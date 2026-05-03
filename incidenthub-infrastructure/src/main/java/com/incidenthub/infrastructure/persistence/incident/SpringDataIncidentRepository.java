@@ -20,4 +20,9 @@ interface SpringDataIncidentRepository extends JpaRepository<IncidentEntity, UUI
             Collection<IncidentStatus> statuses,
             Pageable pageable
     );
+
+    List<IncidentEntity> findByStatus(
+            IncidentStatus status,
+            Pageable pageable
+    );
 }

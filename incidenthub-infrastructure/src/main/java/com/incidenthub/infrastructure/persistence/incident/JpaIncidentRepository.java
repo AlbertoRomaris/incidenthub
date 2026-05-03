@@ -62,4 +62,18 @@ public class JpaIncidentRepository implements IncidentRepository {
                 .map(IncidentEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    public List<Incident> findByStatus(IncidentStatus status, int limit) {
+        PageRequest pageRequest = PageRequest.of(
+                0,
+                limit,
+                Sort.by(Sort.Direction.DESC, "openedAt")
+        );
+
+        return springDataIncidentRepository.findByStatus(status, pageRequest)
+                .stream()
+                .map(IncidentEntity::toDomain)
+                .toList();
+    }
 }

@@ -4,7 +4,8 @@ import com.incidenthub.api.dto.incident.IncidentEvidenceResponse;
 import com.incidenthub.api.dto.incident.IncidentResponse;
 import com.incidenthub.core.application.usecase.GetIncidentByIdUseCase;
 import com.incidenthub.core.application.usecase.ListIncidentEvidenceUseCase;
-import com.incidenthub.core.application.usecase.ListOpenIncidentsUseCase;
+import com.incidenthub.core.application.usecase.ListIncidentsUseCase;
+import com.incidenthub.core.domain.incident.IncidentStatus;
 import com.incidenthub.core.domain.evidence.IncidentEvidence;
 import com.incidenthub.core.domain.incident.Incident;
 import com.incidenthub.core.domain.incident.IncidentId;
@@ -22,30 +23,31 @@ import java.util.UUID;
 public class IncidentController {
 
     private final GetIncidentByIdUseCase getIncidentByIdUseCase;
-    private final ListOpenIncidentsUseCase listOpenIncidentsUseCase;
+    private final ListIncidentsUseCase listIncidentsUseCase;
     private final ListIncidentEvidenceUseCase listIncidentEvidenceUseCase;
     private final AcknowledgeIncidentUseCase acknowledgeIncidentUseCase;
     private final ResolveIncidentUseCase resolveIncidentUseCase;
 
     public IncidentController(
             GetIncidentByIdUseCase getIncidentByIdUseCase,
-            ListOpenIncidentsUseCase listOpenIncidentsUseCase,
+            ListIncidentsUseCase listIncidentsUseCase,
             ListIncidentEvidenceUseCase listIncidentEvidenceUseCase,
             AcknowledgeIncidentUseCase acknowledgeIncidentUseCase,
             ResolveIncidentUseCase resolveIncidentUseCase
     ) {
         this.getIncidentByIdUseCase = getIncidentByIdUseCase;
-        this.listOpenIncidentsUseCase = listOpenIncidentsUseCase;
+        this.listIncidentsUseCase = listIncidentsUseCase;
         this.listIncidentEvidenceUseCase = listIncidentEvidenceUseCase;
         this.acknowledgeIncidentUseCase = acknowledgeIncidentUseCase;
         this.resolveIncidentUseCase = resolveIncidentUseCase;
     }
 
     @GetMapping
-    public List<IncidentResponse> listOpenIncidents(
+    public List<IncidentResponse> listIncidents(
+            @RequestParam(name = "status", required = false) IncidentStatus status,
             @RequestParam(name = "limit", required = false) Integer limit
     ) {
-        return listOpenIncidentsUseCase.listOpen(limit)
+        return listIncidentsUseCase.list(status, limit)
                 .stream()
                 .map(this::toResponse)
                 .toList();

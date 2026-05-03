@@ -15,3 +15,18 @@ POST http://localhost:8080/incidents/f81c4ce8-2cff-44c1-aceb-7e2a9450e8c1/acknow
 
 ### Resolve incident
 POST http://localhost:8080/incidents/f81c4ce8-2cff-44c1-aceb-7e2a9450e8c1/resolve
+
+### List active incidents
+GET http://localhost:8080/incidents?limit=10
+
+
+### List open incidents
+GET http://localhost:8080/incidents?status=OPEN&limit=10
+
+
+### List acknowledged incidents
+GET http://localhost:8080/incidents?status=ACKNOWLEDGED&limit=10
+
+
+### List resolved incidents
+GET http://localhost:8080/incidents?status=RESOLVED&limit=10
