@@ -7,6 +7,8 @@ import com.incidenthub.core.application.port.SignalRepository;
 import com.incidenthub.core.application.usecase.ProcessSignalUseCase;
 import com.incidenthub.core.application.port.IncidentTimelineRepository;
 import com.incidenthub.core.application.port.AlertRepository;
+import com.incidenthub.core.application.port.AlertSender;
+import com.incidenthub.core.application.usecase.SendPendingAlertsUseCase;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -37,6 +39,21 @@ public class WorkerUseCaseConfiguration {
                 incidentEvidenceRepository,
                 incidentTimelineRepository,
                 alertRepository,
+                clock
+        );
+    }
+
+    @Bean
+    public SendPendingAlertsUseCase sendPendingAlertsUseCase(
+            AlertRepository alertRepository,
+            AlertSender alertSender,
+            IncidentTimelineRepository incidentTimelineRepository,
+            Clock clock
+    ) {
+        return new SendPendingAlertsUseCase(
+                alertRepository,
+                alertSender,
+                incidentTimelineRepository,
                 clock
         );
     }

@@ -16,3 +16,6 @@ incidenthub:
     id: local-worker-1
     batch-size: 10
     poll-delay-ms: 5000
+  alerts:
+    batch-size: 10
+    poll-delay-ms: 5000
