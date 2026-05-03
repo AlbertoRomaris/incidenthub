@@ -1,0 +1,2 @@
+### Operational dashboard summary
+GET http://localhost:8080/dashboard/summary

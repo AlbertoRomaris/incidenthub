@@ -56,4 +56,9 @@ public class JpaAlertRepository implements AlertRepository {
                 .map(AlertEntity::toDomain)
                 .toList();
     }
+
+    @Override
+    public long countByStatus(AlertStatus status) {
+        return springDataAlertRepository.countByStatus(status);
+    }
 }

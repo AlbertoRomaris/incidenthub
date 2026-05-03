@@ -1,9 +1,6 @@
 package com.incidenthub.core.application.port;
 
-import com.incidenthub.core.domain.incident.DeduplicationKey;
-import com.incidenthub.core.domain.incident.Incident;
-import com.incidenthub.core.domain.incident.IncidentId;
-import com.incidenthub.core.domain.incident.IncidentStatus;
+import com.incidenthub.core.domain.incident.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +16,8 @@ public interface IncidentRepository {
     List<Incident> findOpenIncidents(int limit);
 
     List<Incident> findByStatus(IncidentStatus status, int limit);
+
+    long countByStatus(IncidentStatus status);
+
+    long countByStatusAndSeverity(IncidentStatus status, IncidentSeverity severity);
 }

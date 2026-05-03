@@ -1,10 +1,7 @@
 package com.incidenthub.infrastructure.persistence.incident;
 
 import com.incidenthub.core.application.port.IncidentRepository;
-import com.incidenthub.core.domain.incident.DeduplicationKey;
-import com.incidenthub.core.domain.incident.Incident;
-import com.incidenthub.core.domain.incident.IncidentId;
-import com.incidenthub.core.domain.incident.IncidentStatus;
+import com.incidenthub.core.domain.incident.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
@@ -75,5 +72,15 @@ public class JpaIncidentRepository implements IncidentRepository {
                 .stream()
                 .map(IncidentEntity::toDomain)
                 .toList();
+    }
+
+    @Override
+    public long countByStatus(IncidentStatus status) {
+        return springDataIncidentRepository.countByStatus(status);
+    }
+
+    @Override
+    public long countByStatusAndSeverity(IncidentStatus status, IncidentSeverity severity) {
+        return springDataIncidentRepository.countByStatusAndSeverity(status, severity);
     }
 }

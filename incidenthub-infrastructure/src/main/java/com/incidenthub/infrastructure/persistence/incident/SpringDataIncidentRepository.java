@@ -1,5 +1,6 @@
 package com.incidenthub.infrastructure.persistence.incident;
 
+import com.incidenthub.core.domain.incident.IncidentSeverity;
 import com.incidenthub.core.domain.incident.IncidentStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,4 +26,8 @@ interface SpringDataIncidentRepository extends JpaRepository<IncidentEntity, UUI
             IncidentStatus status,
             Pageable pageable
     );
+
+    long countByStatus(IncidentStatus status);
+
+    long countByStatusAndSeverity(IncidentStatus status, IncidentSeverity severity);
 }

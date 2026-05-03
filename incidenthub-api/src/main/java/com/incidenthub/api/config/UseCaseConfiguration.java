@@ -101,4 +101,17 @@ public class UseCaseConfiguration {
     public ListIncidentAlertsUseCase listIncidentAlertsUseCase(AlertRepository alertRepository) {
         return new ListIncidentAlertsUseCase(alertRepository);
     }
+
+    @Bean
+    public GetOperationalDashboardSummaryUseCase getOperationalDashboardSummaryUseCase(
+            IncidentRepository incidentRepository,
+            AlertRepository alertRepository,
+            Clock clock
+    ) {
+        return new GetOperationalDashboardSummaryUseCase(
+                incidentRepository,
+                alertRepository,
+                clock
+        );
+    }
 }
