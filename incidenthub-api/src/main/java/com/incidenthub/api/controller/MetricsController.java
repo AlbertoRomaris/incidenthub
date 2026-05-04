@@ -4,11 +4,13 @@ import com.incidenthub.api.dto.metrics.OperationalMetricResponse;
 import com.incidenthub.api.dto.metrics.OperationalMetricsResponse;
 import com.incidenthub.api.dto.metrics.SloEvaluationResponse;
 import com.incidenthub.api.dto.metrics.SloSummaryResponse;
+import com.incidenthub.api.metrics.PrometheusMetricsFormatter;
 import com.incidenthub.core.application.model.OperationalMetricsSummary;
 import com.incidenthub.core.application.usecase.GetOperationalMetricsSummaryUseCase;
 import com.incidenthub.core.domain.metrics.OperationalMetric;
 import com.incidenthub.core.domain.metrics.SloEvaluation;
 import com.incidenthub.core.domain.metrics.SloStatus;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,9 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class MetricsController {
 
     private final GetOperationalMetricsSummaryUseCase getOperationalMetricsSummaryUseCase;
+    private final PrometheusMetricsFormatter prometheusMetricsFormatter;
 
-    public MetricsController(GetOperationalMetricsSummaryUseCase getOperationalMetricsSummaryUseCase) {
+    public MetricsController(
+            GetOperationalMetricsSummaryUseCase getOperationalMetricsSummaryUseCase,
+            PrometheusMetricsFormatter prometheusMetricsFormatter
+    ) {
         this.getOperationalMetricsSummaryUseCase = getOperationalMetricsSummaryUseCase;
+        this.prometheusMetricsFormatter = prometheusMetricsFormatter;
     }
 
     @GetMapping("/metrics/operational")
@@ -57,6 +64,13 @@ public class MetricsController {
                         .map(this::toSloEvaluationResponse)
                         .toList()
         );
+    }
+
+    @GetMapping(value = "/metrics/prometheus", produces = MediaType.TEXT_PLAIN_VALUE)
+    public String getPrometheusMetrics() {
+        OperationalMetricsSummary summary = getOperationalMetricsSummaryUseCase.getSummary();
+
+        return prometheusMetricsFormatter.format(summary);
     }
 
     private OperationalMetricResponse toMetricResponse(OperationalMetric metric) {
