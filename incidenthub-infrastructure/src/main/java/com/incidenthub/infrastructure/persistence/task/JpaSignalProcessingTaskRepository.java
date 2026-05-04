@@ -80,4 +80,11 @@ public class JpaSignalProcessingTaskRepository implements SignalProcessingTaskRe
                 .stream()
                 .findFirst();
     }
+
+    @Override
+    public Optional<Double> findAverageProcessedTaskLatencyMsSince(Instant since) {
+        return Optional.ofNullable(
+                springDataSignalProcessingTaskRepository.findAverageProcessedTaskLatencyMsSince(since)
+        );
+    }
 }

@@ -37,4 +37,15 @@ interface SpringDataSignalProcessingTaskRepository extends JpaRepository<SignalP
             @Param("status") SignalProcessingTaskStatus status,
             Pageable pageable
     );
+
+    @Query(
+            value = """
+                select avg(extract(epoch from (updated_at - created_at)) * 1000)
+                from signal_processing_tasks
+                where status = 'PROCESSED'
+                  and updated_at >= :since
+                """,
+            nativeQuery = true
+    )
+    Double findAverageProcessedTaskLatencyMsSince(@Param("since") Instant since);
 }

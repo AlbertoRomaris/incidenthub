@@ -98,6 +98,17 @@ public record SloDefinition(
         );
     }
 
+    public static SloDefinition signalProcessingAverageLatency() {
+        return new SloDefinition(
+                "signal-processing-average-latency",
+                "Average signal processing latency should stay below 10 seconds.",
+                OperationalMetricName.SIGNAL_PROCESSING_AVERAGE_LATENCY_MS,
+                SloComparison.LESS_THAN_OR_EQUAL,
+                10_000.0,
+                OperationalMetricUnit.MILLISECONDS
+        );
+    }
+
     private static String requireText(String value, String message) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException(message);

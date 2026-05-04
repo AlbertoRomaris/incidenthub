@@ -21,4 +21,7 @@ public interface SignalProcessingTaskRepository {
     long countByStatus(SignalProcessingTaskStatus status);
 
     Optional<Instant> findOldestPendingTaskCreatedAt();
+
+    Optional<Double> findAverageProcessedTaskLatencyMsSince(Instant since);
+
 }

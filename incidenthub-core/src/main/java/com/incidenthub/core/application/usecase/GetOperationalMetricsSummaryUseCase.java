@@ -53,6 +53,11 @@ public class GetOperationalMetricsSummaryUseCase {
 
         double signalProcessingSuccessRate = percentage(processedTasks, processedTasks + failedTasks);
         double oldestPendingTaskAgeSeconds = oldestPendingTaskAgeSeconds(generatedAt);
+        Instant recentProcessingWindowStart = generatedAt.minusSeconds(15 * 60);
+
+        double averageProcessingLatencyMs = signalProcessingTaskRepository
+                .findAverageProcessedTaskLatencyMsSince(recentProcessingWindowStart)
+                .orElse(0.0);
 
         long openIncidents = incidentRepository.countByStatus(IncidentStatus.OPEN);
         long acknowledgedIncidents = incidentRepository.countByStatus(IncidentStatus.ACKNOWLEDGED);
@@ -93,13 +98,20 @@ public class GetOperationalMetricsSummaryUseCase {
                         generatedAt
                 ),
                 OperationalMetric.gauge(
+                        OperationalMetricName.SIGNAL_PROCESSING_AVERAGE_LATENCY_MS,
+                        OperationalMetricUnit.MILLISECONDS,
+                        averageProcessingLatencyMs,
+                        generatedAt
+                ),
+                OperationalMetric.gauge(
                         OperationalMetricName.OLDEST_PENDING_TASK_AGE_SECONDS,
                         OperationalMetricUnit.SECONDS,
                         oldestPendingTaskAgeSeconds,
                         generatedAt
                 ),
-                OperationalMetric.counter(
-                        OperationalMetricName.INCIDENTS_OPEN_TOTAL,
+                OperationalMetric.gauge(
+                        OperationalMetricName.INCIDENTS_OPEN,
+                        OperationalMetricUnit.COUNT,
                         openIncidents,
                         generatedAt
                 ),
@@ -169,6 +181,10 @@ public class GetOperationalMetricsSummaryUseCase {
                 ),
                 SloDefinition.oldestPendingTaskAge().evaluate(
                         findMetric(metrics, OperationalMetricName.OLDEST_PENDING_TASK_AGE_SECONDS),
+                        generatedAt
+                ),
+                SloDefinition.signalProcessingAverageLatency().evaluate(
+                        findMetric(metrics, OperationalMetricName.SIGNAL_PROCESSING_AVERAGE_LATENCY_MS),
                         generatedAt
                 )
         );
