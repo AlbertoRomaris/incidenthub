@@ -1,13 +1,16 @@
 package com.incidenthub.infrastructure.persistence.task;
 
 import com.incidenthub.core.application.model.SignalProcessingTask;
+import com.incidenthub.core.application.model.SignalProcessingTaskStatus;
 import com.incidenthub.core.application.port.SignalProcessingTaskRepository;
 import com.incidenthub.core.domain.signal.SignalId;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class JpaSignalProcessingTaskRepository implements SignalProcessingTaskRepository {
@@ -60,5 +63,21 @@ public class JpaSignalProcessingTaskRepository implements SignalProcessingTaskRe
                 .orElseThrow(() -> new IllegalArgumentException("Signal processing task not found"));
 
         entity.markFailed(errorMessage, failedAt);
+    }
+
+    @Override
+    public long countByStatus(SignalProcessingTaskStatus status) {
+        return springDataSignalProcessingTaskRepository.countByStatus(status);
+    }
+
+    @Override
+    public Optional<Instant> findOldestPendingTaskCreatedAt() {
+        return springDataSignalProcessingTaskRepository
+                .findCreatedAtByStatusOrderByCreatedAtAsc(
+                        SignalProcessingTaskStatus.PENDING,
+                        PageRequest.of(0, 1)
+                )
+                .stream()
+                .findFirst();
     }
 }

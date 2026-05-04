@@ -1,10 +1,12 @@
 package com.incidenthub.core.application.port;
 
 import com.incidenthub.core.application.model.SignalProcessingTask;
+import com.incidenthub.core.application.model.SignalProcessingTaskStatus;
 import com.incidenthub.core.domain.signal.SignalId;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 public interface SignalProcessingTaskRepository {
 
@@ -15,4 +17,8 @@ public interface SignalProcessingTaskRepository {
     void markProcessed(SignalId signalId, Instant processedAt);
 
     void markFailed(SignalId signalId, String errorMessage, Instant failedAt);
+
+    long countByStatus(SignalProcessingTaskStatus status);
+
+    Optional<Instant> findOldestPendingTaskCreatedAt();
 }
