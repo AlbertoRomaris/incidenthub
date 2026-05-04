@@ -114,4 +114,19 @@ public class UseCaseConfiguration {
                 clock
         );
     }
+
+    @Bean
+    public GetOperationalMetricsSummaryUseCase getOperationalMetricsSummaryUseCase(
+            SignalProcessingTaskRepository signalProcessingTaskRepository,
+            IncidentRepository incidentRepository,
+            AlertRepository alertRepository,
+            Clock clock
+    ) {
+        return new GetOperationalMetricsSummaryUseCase(
+                signalProcessingTaskRepository,
+                incidentRepository,
+                alertRepository,
+                clock
+        );
+    }
 }

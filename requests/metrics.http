@@ -1,0 +1,5 @@
+### Operational metrics
+GET http://localhost:8080/metrics/operational
+
+### SLO summary
+GET http://localhost:8080/slo/summary
