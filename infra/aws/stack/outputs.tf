@@ -17,3 +17,19 @@ output "common_tags" {
   description = "Common tags applied to stack resources."
   value       = local.common_tags
 }
+
+output "ecr_repository_urls" {
+  description = "ECR repository URLs by service."
+  value = {
+    for service_name, repository in aws_ecr_repository.services :
+    service_name => repository.repository_url
+  }
+}
+
+output "ecr_repository_names" {
+  description = "ECR repository names by service."
+  value = {
+    for service_name, repository in aws_ecr_repository.services :
+    service_name => repository.name
+  }
+}
