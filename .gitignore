@@ -24,3 +24,11 @@ application-local-private.yml
 *.jar
 *.war
 *.ear
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
