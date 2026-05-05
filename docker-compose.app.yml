@@ -1,0 +1,46 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: incidenthub-postgres-app
+    environment:
+      POSTGRES_DB: incidenthub
+      POSTGRES_USER: incidenthub
+      POSTGRES_PASSWORD: incidenthub
+    ports:
+      - "5435:5432"
+    volumes:
+      - incidenthub-postgres-app-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U incidenthub -d incidenthub"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  incidenthub-api:
+    image: incidenthub-api:local
+    container_name: incidenthub-api-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/incidenthub
+      SPRING_DATASOURCE_USERNAME: incidenthub
+      SPRING_DATASOURCE_PASSWORD: incidenthub
+    ports:
+      - "8081:8080"
+
+  incidenthub-worker:
+    image: incidenthub-worker:local
+    container_name: incidenthub-worker-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/incidenthub
+      SPRING_DATASOURCE_USERNAME: incidenthub
+      SPRING_DATASOURCE_PASSWORD: incidenthub
+
+volumes:
+  incidenthub-postgres-app-data:
