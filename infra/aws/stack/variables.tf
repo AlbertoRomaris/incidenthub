@@ -43,3 +43,38 @@ variable "ecr_lifecycle_keep_last_images" {
     error_message = "The number of ECR images to keep must be greater than zero."
   }
 }
+
+variable "vpc_cidr" {
+  description = "CIDR block for the IncidentHub VPC."
+  type        = string
+  default     = "10.20.0.0/16"
+}
+
+variable "availability_zone_count" {
+  description = "Number of availability zones to use."
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.availability_zone_count >= 2 && var.availability_zone_count <= 3
+    error_message = "availability_zone_count must be between 2 and 3."
+  }
+}
+
+variable "public_subnet_cidrs" {
+  description = "CIDR blocks for public subnets."
+  type        = list(string)
+  default     = ["10.20.0.0/24", "10.20.1.0/24", "10.20.2.0/24"]
+}
+
+variable "private_subnet_cidrs" {
+  description = "CIDR blocks for private subnets."
+  type        = list(string)
+  default     = ["10.20.10.0/24", "10.20.11.0/24", "10.20.12.0/24"]
+}
+
+variable "enable_nat_gateway" {
+  description = "Whether to create a NAT Gateway for private subnet outbound internet access. Disabled by default to avoid cost."
+  type        = bool
+  default     = false
+}
