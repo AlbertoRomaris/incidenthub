@@ -96,3 +96,57 @@ variable "database_port" {
   type        = number
   default     = 5432
 }
+
+variable "database_name" {
+  description = "PostgreSQL database name used by IncidentHub."
+  type        = string
+  default     = "incidenthub"
+}
+
+variable "database_username" {
+  description = "PostgreSQL master username used by IncidentHub."
+  type        = string
+  default     = "incidenthub"
+}
+
+variable "database_instance_class" {
+  description = "RDS PostgreSQL instance class."
+  type        = string
+  default     = "db.t4g.micro"
+}
+
+variable "database_allocated_storage" {
+  description = "Allocated storage in GB for the RDS PostgreSQL instance."
+  type        = number
+  default     = 20
+}
+
+variable "database_max_allocated_storage" {
+  description = "Maximum allocated storage in GB for RDS autoscaling."
+  type        = number
+  default     = 50
+}
+
+variable "database_engine_version" {
+  description = "PostgreSQL engine version."
+  type        = string
+  default     = "16"
+}
+
+variable "database_backup_retention_days" {
+  description = "Number of days to retain automated database backups."
+  type        = number
+  default     = 7
+}
+
+variable "database_deletion_protection" {
+  description = "Whether deletion protection is enabled for the database."
+  type        = bool
+  default     = false
+}
+
+variable "database_skip_final_snapshot" {
+  description = "Whether to skip the final snapshot when destroying the dev database."
+  type        = bool
+  default     = true
+}

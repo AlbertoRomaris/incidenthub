@@ -68,3 +68,30 @@ output "security_group_ids" {
     database = aws_security_group.database.id
   }
 }
+
+output "database_endpoint" {
+  description = "RDS PostgreSQL endpoint."
+  value       = aws_db_instance.postgres.address
+}
+
+output "database_port" {
+  description = "RDS PostgreSQL port."
+  value       = aws_db_instance.postgres.port
+}
+
+output "database_name" {
+  description = "IncidentHub database name."
+  value       = aws_db_instance.postgres.db_name
+}
+
+output "database_username" {
+  description = "IncidentHub database username."
+  value       = aws_db_instance.postgres.username
+  sensitive   = true
+}
+
+output "database_master_user_secret_arn" {
+  description = "ARN of the RDS-managed master user secret."
+  value       = aws_db_instance.postgres.master_user_secret[0].secret_arn
+  sensitive   = true
+}
