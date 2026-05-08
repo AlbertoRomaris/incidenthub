@@ -78,3 +78,21 @@ variable "enable_nat_gateway" {
   type        = bool
   default     = false
 }
+
+variable "allowed_http_cidr_blocks" {
+  description = "CIDR blocks allowed to access the public ALB over HTTP."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "api_container_port" {
+  description = "Container port exposed by the IncidentHub API."
+  type        = number
+  default     = 8080
+}
+
+variable "database_port" {
+  description = "PostgreSQL database port."
+  type        = number
+  default     = 5432
+}

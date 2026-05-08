@@ -58,3 +58,13 @@ output "availability_zones" {
   description = "Availability zones used by the stack."
   value       = local.selected_availability_zones
 }
+
+output "security_group_ids" {
+  description = "Security group ids used by the IncidentHub stack."
+  value = {
+    alb      = aws_security_group.alb.id
+    api      = aws_security_group.api.id
+    worker   = aws_security_group.worker.id
+    database = aws_security_group.database.id
+  }
+}
