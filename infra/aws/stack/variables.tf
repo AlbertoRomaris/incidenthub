@@ -150,3 +150,15 @@ variable "database_skip_final_snapshot" {
   type        = bool
   default     = true
 }
+
+variable "ecs_container_insights_enabled" {
+  description = "Whether ECS Container Insights should be enabled."
+  type        = bool
+  default     = false
+}
+
+variable "cloudwatch_log_retention_days" {
+  description = "Number of days to retain CloudWatch logs."
+  type        = number
+  default     = 14
+}

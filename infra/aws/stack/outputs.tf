@@ -95,3 +95,21 @@ output "database_master_user_secret_arn" {
   value       = aws_db_instance.postgres.master_user_secret[0].secret_arn
   sensitive   = true
 }
+
+output "ecs_cluster_name" {
+  description = "ECS cluster name."
+  value       = aws_ecs_cluster.main.name
+}
+
+output "ecs_cluster_arn" {
+  description = "ECS cluster ARN."
+  value       = aws_ecs_cluster.main.arn
+}
+
+output "cloudwatch_log_group_names" {
+  description = "CloudWatch log group names used by ECS services."
+  value = {
+    api    = aws_cloudwatch_log_group.api.name
+    worker = aws_cloudwatch_log_group.worker.name
+  }
+}
