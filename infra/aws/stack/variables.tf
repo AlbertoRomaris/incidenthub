@@ -134,9 +134,9 @@ variable "database_engine_version" {
 }
 
 variable "database_backup_retention_days" {
-  description = "Number of days to retain automated database backups."
+  description = "Number of days to retain automated database backups. Defaults to 0 for low-cost dev deployments."
   type        = number
-  default     = 7
+  default     = 0
 }
 
 variable "database_deletion_protection" {
