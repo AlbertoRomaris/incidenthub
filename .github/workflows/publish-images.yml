@@ -64,3 +64,26 @@ jobs:
             .
 
           docker push $ECR_REGISTRY/$WORKER_REPOSITORY:$IMAGE_TAG
+      - name: Show AWS CLI version
+        run: aws --version
+
+      - name: Force ECS new deployment
+        run: |
+          aws ecs update-service \
+            --cluster incidenthub-dev-cluster \
+            --service incidenthub-dev-api \
+            --force-new-deployment \
+            --region $AWS_REGION
+
+          aws ecs update-service \
+            --cluster incidenthub-dev-cluster \
+            --service incidenthub-dev-worker \
+            --force-new-deployment \
+            --region $AWS_REGION
+
+      - name: Wait for ECS services to become stable
+        run: |
+          aws ecs wait services-stable \
+            --cluster incidenthub-dev-cluster \
+            --services incidenthub-dev-api incidenthub-dev-worker \
+            --region $AWS_REGION

@@ -95,3 +95,35 @@ resource "aws_iam_role_policy_attachment" "github_actions_ecr_push" {
   role       = aws_iam_role.github_actions_deployer.name
   policy_arn = aws_iam_policy.github_actions_ecr_push.arn
 }
+
+data "aws_iam_policy_document" "github_actions_ecs_deploy" {
+  statement {
+    sid    = "AllowRedeployIncidentHubServices"
+    effect = "Allow"
+
+    actions = [
+      "ecs:DescribeServices",
+      "ecs:UpdateService"
+    ]
+
+    resources = [
+      aws_ecs_service.api.id,
+      aws_ecs_service.worker.id
+    ]
+  }
+}
+
+resource "aws_iam_policy" "github_actions_ecs_deploy" {
+  name        = "${local.name_prefix}-github-actions-ecs-deploy-policy"
+  description = "Allow GitHub Actions to force new deployments for IncidentHub ECS services."
+  policy      = data.aws_iam_policy_document.github_actions_ecs_deploy.json
+
+  tags = merge(local.common_tags, {
+    Name = "${local.name_prefix}-github-actions-ecs-deploy-policy"
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "github_actions_ecs_deploy" {
+  role       = aws_iam_role.github_actions_deployer.name
+  policy_arn = aws_iam_policy.github_actions_ecs_deploy.arn
+}
