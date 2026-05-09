@@ -174,3 +174,33 @@ variable "api_health_check_path" {
   type        = string
   default     = "/actuator/health"
 }
+
+variable "api_image_tag" {
+  description = "Docker image tag used by the IncidentHub API ECS task."
+  type        = string
+  default     = "dev"
+}
+
+variable "api_desired_count" {
+  description = "Desired number of IncidentHub API tasks."
+  type        = number
+  default     = 1
+}
+
+variable "api_task_cpu" {
+  description = "CPU units for the IncidentHub API Fargate task."
+  type        = number
+  default     = 512
+}
+
+variable "api_task_memory" {
+  description = "Memory in MiB for the IncidentHub API Fargate task."
+  type        = number
+  default     = 1024
+}
+
+variable "api_health_check_grace_period_seconds" {
+  description = "Health check grace period for the IncidentHub API ECS service."
+  type        = number
+  default     = 60
+}

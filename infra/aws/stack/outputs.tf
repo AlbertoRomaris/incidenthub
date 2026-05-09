@@ -143,3 +143,13 @@ output "api_http_listener_arn" {
   description = "ARN of the API HTTP listener."
   value       = aws_lb_listener.api_http.arn
 }
+
+output "api_task_definition_arn" {
+  description = "IncidentHub API ECS task definition ARN."
+  value       = aws_ecs_task_definition.api.arn
+}
+
+output "api_ecs_service_name" {
+  description = "IncidentHub API ECS service name."
+  value       = aws_ecs_service.api.name
+}
