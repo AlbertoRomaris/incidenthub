@@ -1,0 +1,66 @@
+name: Publish Docker Images
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "pom.xml"
+      - "incidenthub-core/**"
+      - "incidenthub-infrastructure/**"
+      - "incidenthub-api/**"
+      - "incidenthub-worker/**"
+      - ".github/workflows/publish-images.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: eu-west-1
+  AWS_ROLE_ARN: arn:aws:iam::583880312081:role/incidenthub-dev-github-actions-deployer
+  API_REPOSITORY: incidenthub-dev-api
+  WORKER_REPOSITORY: incidenthub-dev-worker
+  IMAGE_TAG: dev
+
+jobs:
+  publish:
+    name: Build and push Docker images
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials through OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push API image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker build \
+            -f incidenthub-api/Dockerfile \
+            -t $ECR_REGISTRY/$API_REPOSITORY:$IMAGE_TAG \
+            .
+
+          docker push $ECR_REGISTRY/$API_REPOSITORY:$IMAGE_TAG
+
+      - name: Build and push Worker image
+        env:
+          ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
+        run: |
+          docker build \
+            -f incidenthub-worker/Dockerfile \
+            -t $ECR_REGISTRY/$WORKER_REPOSITORY:$IMAGE_TAG \
+            .
+
+          docker push $ECR_REGISTRY/$WORKER_REPOSITORY:$IMAGE_TAG
