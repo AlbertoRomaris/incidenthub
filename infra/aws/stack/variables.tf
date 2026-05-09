@@ -162,3 +162,15 @@ variable "cloudwatch_log_retention_days" {
   type        = number
   default     = 14
 }
+
+variable "alb_enable_deletion_protection" {
+  description = "Whether deletion protection is enabled for the API Application Load Balancer."
+  type        = bool
+  default     = false
+}
+
+variable "api_health_check_path" {
+  description = "Health check path used by the API target group."
+  type        = string
+  default     = "/actuator/health"
+}

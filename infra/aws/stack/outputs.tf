@@ -123,3 +123,23 @@ output "ecs_task_role_arn" {
   description = "IAM role ARN assumed by IncidentHub containers at runtime."
   value       = aws_iam_role.ecs_task.arn
 }
+
+output "api_load_balancer_dns_name" {
+  description = "Public DNS name of the API Application Load Balancer."
+  value       = aws_lb.api.dns_name
+}
+
+output "api_load_balancer_arn" {
+  description = "ARN of the API Application Load Balancer."
+  value       = aws_lb.api.arn
+}
+
+output "api_target_group_arn" {
+  description = "ARN of the API target group."
+  value       = aws_lb_target_group.api.arn
+}
+
+output "api_http_listener_arn" {
+  description = "ARN of the API HTTP listener."
+  value       = aws_lb_listener.api_http.arn
+}
