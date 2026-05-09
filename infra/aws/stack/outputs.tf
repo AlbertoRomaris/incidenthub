@@ -206,3 +206,8 @@ output "cloudwatch_dashboard_name" {
   description = "CloudWatch dashboard name for IncidentHub runtime visibility."
   value       = aws_cloudwatch_dashboard.main.dashboard_name
 }
+
+output "github_actions_deployer_role_arn" {
+  description = "IAM role ARN assumed by GitHub Actions through OIDC."
+  value       = aws_iam_role.github_actions_deployer.arn
+}
