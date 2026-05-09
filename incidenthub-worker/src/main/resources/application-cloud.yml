@@ -28,7 +28,10 @@ incidenthub:
   alerts:
     batch-size: ${INCIDENTHUB_ALERTS_BATCH_SIZE:10}
     poll-delay-ms: ${INCIDENTHUB_ALERTS_POLL_DELAY_MS:5000}
-
+    channel: ${INCIDENTHUB_ALERTS_CHANNEL:LOG}
+    sender: ${INCIDENTHUB_ALERTS_SENDER:log}
+    sns:
+      topic-arn: ${INCIDENTHUB_ALERTS_SNS_TOPIC_ARN:}
 management:
   endpoints:
     web:

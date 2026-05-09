@@ -1,11 +1,14 @@
 package com.incidenthub.core.application.usecase;
 
 import com.incidenthub.core.application.model.ProcessSignalResult;
+import com.incidenthub.core.application.port.AlertRepository;
 import com.incidenthub.core.application.port.IncidentEvidenceRepository;
 import com.incidenthub.core.application.port.IncidentRepository;
 import com.incidenthub.core.application.port.IncidentTimelineRepository;
 import com.incidenthub.core.application.port.RuleRepository;
 import com.incidenthub.core.application.port.SignalRepository;
+import com.incidenthub.core.domain.alert.Alert;
+import com.incidenthub.core.domain.alert.AlertChannel;
 import com.incidenthub.core.domain.evidence.IncidentEvidence;
 import com.incidenthub.core.domain.incident.DeduplicationKey;
 import com.incidenthub.core.domain.incident.Incident;
@@ -18,9 +21,6 @@ import com.incidenthub.core.domain.signal.Signal;
 import com.incidenthub.core.domain.signal.SignalId;
 import com.incidenthub.core.domain.timeline.IncidentTimelineEvent;
 import com.incidenthub.core.domain.timeline.IncidentTimelineEventType;
-import com.incidenthub.core.application.port.AlertRepository;
-import com.incidenthub.core.domain.alert.Alert;
-import com.incidenthub.core.domain.alert.AlertChannel;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -36,8 +36,9 @@ public class ProcessSignalUseCase {
     private final IncidentRepository incidentRepository;
     private final IncidentEvidenceRepository incidentEvidenceRepository;
     private final IncidentTimelineRepository incidentTimelineRepository;
-    private final Clock clock;
     private final AlertRepository alertRepository;
+    private final Clock clock;
+    private final AlertChannel alertChannel;
 
     public ProcessSignalUseCase(
             SignalRepository signalRepository,
@@ -46,7 +47,8 @@ public class ProcessSignalUseCase {
             IncidentEvidenceRepository incidentEvidenceRepository,
             IncidentTimelineRepository incidentTimelineRepository,
             AlertRepository alertRepository,
-            Clock clock
+            Clock clock,
+            AlertChannel alertChannel
     ) {
         this.signalRepository = Objects.requireNonNull(signalRepository, "Signal repository must not be null");
         this.ruleRepository = Objects.requireNonNull(ruleRepository, "Rule repository must not be null");
@@ -55,6 +57,7 @@ public class ProcessSignalUseCase {
         this.incidentTimelineRepository = Objects.requireNonNull(incidentTimelineRepository, "Incident timeline repository must not be null");
         this.alertRepository = Objects.requireNonNull(alertRepository, "Alert repository must not be null");
         this.clock = Objects.requireNonNull(clock, "Clock must not be null");
+        this.alertChannel = Objects.requireNonNull(alertChannel, "Alert channel must not be null");
     }
 
     public ProcessSignalResult process(SignalId signalId) {
@@ -288,7 +291,7 @@ public class ProcessSignalUseCase {
     ) {
         Alert alert = Alert.pending(
                 incident.id(),
-                AlertChannel.LOG,
+                alertChannel,
                 "Incident opened: " + incident.summary(),
                 buildAlertMessage(incident, rule, evaluationResult),
                 createdAt,

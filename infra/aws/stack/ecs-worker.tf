@@ -63,6 +63,26 @@ resource "aws_ecs_task_definition" "worker" {
           value = "INFO"
         },
         {
+          name  = "INCIDENTHUB_ALERTS_CHANNEL"
+          value = "SNS"
+        },
+        {
+          name  = "INCIDENTHUB_ALERTS_SENDER"
+          value = "sns"
+        },
+        {
+          name  = "INCIDENTHUB_ALERTS_SNS_TOPIC_ARN"
+          value = aws_sns_topic.alerts.arn
+        },
+        {
+          name  = "AWS_REGION"
+          value = var.aws_region
+        },
+        {
+          name  = "AWS_DEFAULT_REGION"
+          value = var.aws_region
+        },
+        {
           name  = "LOGGING_LEVEL_INCIDENTHUB"
           value = "INFO"
         }

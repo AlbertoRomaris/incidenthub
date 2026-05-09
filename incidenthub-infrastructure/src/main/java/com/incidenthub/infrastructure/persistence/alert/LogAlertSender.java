@@ -5,9 +5,7 @@ import com.incidenthub.core.domain.alert.Alert;
 import com.incidenthub.core.domain.alert.AlertChannel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
-@Component
 public class LogAlertSender implements AlertSender {
 
     private static final Logger log = LoggerFactory.getLogger(LogAlertSender.class);
