@@ -201,3 +201,8 @@ output "cloudwatch_alarm_names" {
     signal_processing_dlq_messages  = aws_cloudwatch_metric_alarm.signal_processing_dlq_messages.alarm_name
   }
 }
+
+output "cloudwatch_dashboard_name" {
+  description = "CloudWatch dashboard name for IncidentHub runtime visibility."
+  value       = aws_cloudwatch_dashboard.main.dashboard_name
+}
