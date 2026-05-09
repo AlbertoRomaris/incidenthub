@@ -32,3 +32,11 @@ application-local-private.yml
 *.tfvars
 !*.tfvars.example
 .terraform.lock.hcl
+
+# Local diagnostics
+diagnostics/
+
+# Terraform plans
+tfplan
+*.tfplan
+*.tfplan.*
