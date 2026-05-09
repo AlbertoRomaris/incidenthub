@@ -270,3 +270,39 @@ variable "signal_queue_dlq_max_receive_count" {
   type        = number
   default     = 5
 }
+
+variable "alarm_actions" {
+  description = "List of ARNs notified when CloudWatch alarms enter ALARM state."
+  type        = list(string)
+  default     = []
+}
+
+variable "alb_5xx_alarm_threshold" {
+  description = "Threshold for ALB 5XX errors."
+  type        = number
+  default     = 5
+}
+
+variable "rds_cpu_alarm_threshold" {
+  description = "RDS CPU utilization threshold percentage."
+  type        = number
+  default     = 80
+}
+
+variable "rds_free_storage_alarm_threshold_bytes" {
+  description = "RDS free storage threshold in bytes."
+  type        = number
+  default     = 2147483648
+}
+
+variable "sqs_visible_messages_alarm_threshold" {
+  description = "Threshold for visible messages in the signal processing queue."
+  type        = number
+  default     = 100
+}
+
+variable "sqs_oldest_message_age_alarm_threshold_seconds" {
+  description = "Threshold for age of the oldest SQS message."
+  type        = number
+  default     = 300
+}

@@ -188,3 +188,16 @@ output "alerts_topic_arn" {
   description = "SNS topic ARN used for IncidentHub alerts."
   value       = aws_sns_topic.alerts.arn
 }
+
+output "cloudwatch_alarm_names" {
+  description = "CloudWatch alarm names for IncidentHub runtime health."
+  value = {
+    api_alb_5xx                     = aws_cloudwatch_metric_alarm.api_alb_5xx.alarm_name
+    api_unhealthy_hosts             = aws_cloudwatch_metric_alarm.api_unhealthy_hosts.alarm_name
+    rds_high_cpu                    = aws_cloudwatch_metric_alarm.rds_high_cpu.alarm_name
+    rds_low_free_storage            = aws_cloudwatch_metric_alarm.rds_low_free_storage.alarm_name
+    signal_queue_visible_messages   = aws_cloudwatch_metric_alarm.signal_queue_visible_messages.alarm_name
+    signal_queue_oldest_message_age = aws_cloudwatch_metric_alarm.signal_queue_oldest_message_age.alarm_name
+    signal_processing_dlq_messages  = aws_cloudwatch_metric_alarm.signal_processing_dlq_messages.alarm_name
+  }
+}
