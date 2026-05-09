@@ -1,4 +1,4 @@
-package com.incidenthub.infrastructure.alert;
+package com.incidenthub.infrastructure.persistence.alert;
 
 import com.incidenthub.core.application.port.AlertSender;
 import com.incidenthub.core.domain.alert.Alert;
