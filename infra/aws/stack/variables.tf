@@ -252,3 +252,21 @@ variable "alerts_poll_delay_ms" {
   type        = number
   default     = 5000
 }
+
+variable "signal_queue_visibility_timeout_seconds" {
+  description = "Visibility timeout in seconds for the SQS signal processing queue."
+  type        = number
+  default     = 60
+}
+
+variable "signal_queue_message_retention_seconds" {
+  description = "Message retention in seconds for the SQS signal processing queue."
+  type        = number
+  default     = 345600
+}
+
+variable "signal_queue_dlq_max_receive_count" {
+  description = "Number of receives before a signal queue message is moved to the DLQ."
+  type        = number
+  default     = 5
+}

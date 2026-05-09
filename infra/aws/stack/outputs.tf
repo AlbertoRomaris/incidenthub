@@ -163,3 +163,28 @@ output "worker_ecs_service_name" {
   description = "IncidentHub Worker ECS service name."
   value       = aws_ecs_service.worker.name
 }
+
+output "signal_processing_queue_url" {
+  description = "SQS signal processing queue URL."
+  value       = aws_sqs_queue.signal_processing.url
+}
+
+output "signal_processing_queue_arn" {
+  description = "SQS signal processing queue ARN."
+  value       = aws_sqs_queue.signal_processing.arn
+}
+
+output "signal_processing_dlq_url" {
+  description = "SQS signal processing dead-letter queue URL."
+  value       = aws_sqs_queue.signal_processing_dlq.url
+}
+
+output "signal_processing_dlq_arn" {
+  description = "SQS signal processing dead-letter queue ARN."
+  value       = aws_sqs_queue.signal_processing_dlq.arn
+}
+
+output "alerts_topic_arn" {
+  description = "SNS topic ARN used for IncidentHub alerts."
+  value       = aws_sns_topic.alerts.arn
+}

@@ -65,3 +65,52 @@ resource "aws_iam_role" "ecs_task" {
     Name = "${local.name_prefix}-ecs-task-role"
   }
 }
+
+data "aws_iam_policy_document" "ecs_task_messaging" {
+  statement {
+    sid    = "AllowSignalQueueAccess"
+    effect = "Allow"
+
+    actions = [
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:SendMessage",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:ChangeMessageVisibility"
+    ]
+
+    resources = [
+      aws_sqs_queue.signal_processing.arn,
+      aws_sqs_queue.signal_processing_dlq.arn
+    ]
+  }
+
+  statement {
+    sid    = "AllowAlertPublishing"
+    effect = "Allow"
+
+    actions = [
+      "sns:Publish"
+    ]
+
+    resources = [
+      aws_sns_topic.alerts.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "ecs_task_messaging" {
+  name        = "${local.name_prefix}-ecs-task-messaging-policy"
+  description = "Allow IncidentHub ECS tasks to use SQS signal queue and SNS alert topic."
+  policy      = data.aws_iam_policy_document.ecs_task_messaging.json
+
+  tags = {
+    Name = "${local.name_prefix}-ecs-task-messaging-policy"
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_task_messaging" {
+  role       = aws_iam_role.ecs_task.name
+  policy_arn = aws_iam_policy.ecs_task_messaging.arn
+}
