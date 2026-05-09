@@ -204,3 +204,51 @@ variable "api_health_check_grace_period_seconds" {
   type        = number
   default     = 60
 }
+
+variable "worker_image_tag" {
+  description = "Docker image tag used by the IncidentHub Worker ECS task."
+  type        = string
+  default     = "dev"
+}
+
+variable "worker_desired_count" {
+  description = "Desired number of IncidentHub Worker tasks."
+  type        = number
+  default     = 1
+}
+
+variable "worker_task_cpu" {
+  description = "CPU units for the IncidentHub Worker Fargate task."
+  type        = number
+  default     = 512
+}
+
+variable "worker_task_memory" {
+  description = "Memory in MiB for the IncidentHub Worker Fargate task."
+  type        = number
+  default     = 1024
+}
+
+variable "worker_batch_size" {
+  description = "Number of signal processing tasks claimed per Worker polling cycle."
+  type        = number
+  default     = 10
+}
+
+variable "worker_poll_delay_ms" {
+  description = "Delay in milliseconds between Worker signal processing polling cycles."
+  type        = number
+  default     = 5000
+}
+
+variable "alerts_batch_size" {
+  description = "Number of pending alerts claimed per Worker polling cycle."
+  type        = number
+  default     = 10
+}
+
+variable "alerts_poll_delay_ms" {
+  description = "Delay in milliseconds between Worker alert delivery polling cycles."
+  type        = number
+  default     = 5000
+}

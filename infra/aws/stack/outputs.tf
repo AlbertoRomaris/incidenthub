@@ -153,3 +153,13 @@ output "api_ecs_service_name" {
   description = "IncidentHub API ECS service name."
   value       = aws_ecs_service.api.name
 }
+
+output "worker_task_definition_arn" {
+  description = "IncidentHub Worker ECS task definition ARN."
+  value       = aws_ecs_task_definition.worker.arn
+}
+
+output "worker_ecs_service_name" {
+  description = "IncidentHub Worker ECS service name."
+  value       = aws_ecs_service.worker.name
+}
