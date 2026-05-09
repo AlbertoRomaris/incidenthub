@@ -2,63 +2,105 @@ param(
     [string]$AwsRegion = "eu-west-1",
     [string]$ProjectName = "incidenthub",
     [string]$Environment = "dev",
-    [string]$ImageTag = "dev",
-    [string]$AwsProfile = ""
+    [string]$ImageTag = "dev"
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$awsProfileArgs = @()
+function Invoke-NativeCommand {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$Description,
 
-if (-not [string]::IsNullOrWhiteSpace($AwsProfile)) {
-    $awsProfileArgs = @("--profile", $AwsProfile)
+        [Parameter(Mandatory = $true)]
+        [scriptblock]$Command
+    )
+
+    Write-Host ""
+    Write-Host "==> $Description"
+
+    & $Command
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "Command failed: $Description. Exit code: $LASTEXITCODE"
+    }
 }
 
 Write-Host "Resolving AWS account id..."
-$AwsAccountId = aws sts get-caller-identity @awsProfileArgs --query Account --output text
+
+$AwsAccountId = aws sts get-caller-identity --query Account --output text --region $AwsRegion
 
 if ([string]::IsNullOrWhiteSpace($AwsAccountId)) {
-    throw "Could not resolve AWS account id. Check your AWS credentials."
+    throw "Could not resolve AWS account id."
 }
 
 $Registry = "$AwsAccountId.dkr.ecr.$AwsRegion.amazonaws.com"
-$ApiRepository = "$Registry/$ProjectName-$Environment-api"
-$WorkerRepository = "$Registry/$ProjectName-$Environment-worker"
+
+$ApiRepositoryName = "$ProjectName-$Environment-api"
+$WorkerRepositoryName = "$ProjectName-$Environment-worker"
+
+$ApiImage = "$Registry/$ApiRepositoryName`:$ImageTag"
+$WorkerImage = "$Registry/$WorkerRepositoryName`:$ImageTag"
 
 Write-Host "AWS Account: $AwsAccountId"
 Write-Host "AWS Region : $AwsRegion"
 Write-Host "Registry   : $Registry"
-Write-Host "API repo   : $ApiRepository"
-Write-Host "Worker repo: $WorkerRepository"
+Write-Host "API image  : $ApiImage"
+Write-Host "Worker img : $WorkerImage"
 Write-Host "Image tag  : $ImageTag"
 
-Write-Host "Authenticating Docker with Amazon ECR..."
-aws ecr get-login-password --region $AwsRegion @awsProfileArgs |
-    docker login --username AWS --password-stdin $Registry
+Invoke-NativeCommand "Authenticating Docker with Amazon ECR" {
+    cmd /c "aws ecr get-login-password --region $AwsRegion | docker login --username AWS --password-stdin $Registry"
+}
 
-Write-Host "Checking ECR repositories exist..."
-aws ecr describe-repositories `
-    --region $AwsRegion `
-    --repository-names "$ProjectName-$Environment-api" "$ProjectName-$Environment-worker" `
-    @awsProfileArgs | Out-Null
+Invoke-NativeCommand "Checking API ECR repository exists" {
+    aws ecr describe-repositories `
+        --repository-names $ApiRepositoryName `
+        --region $AwsRegion `
+        --output text | Out-Null
+}
 
-Write-Host "Building IncidentHub API image..."
-docker build -f incidenthub-api/Dockerfile -t incidenthub-api:local .
+Invoke-NativeCommand "Checking Worker ECR repository exists" {
+    aws ecr describe-repositories `
+        --repository-names $WorkerRepositoryName `
+        --region $AwsRegion `
+        --output text | Out-Null
+}
 
-Write-Host "Building IncidentHub Worker image..."
-docker build -f incidenthub-worker/Dockerfile -t incidenthub-worker:local .
+Invoke-NativeCommand "Building IncidentHub API image" {
+    docker build `
+        -f incidenthub-api/Dockerfile `
+        -t incidenthub-api:local `
+        .
+}
 
-Write-Host "Tagging images..."
-docker tag incidenthub-api:local "${ApiRepository}:${ImageTag}"
-docker tag incidenthub-worker:local "${WorkerRepository}:${ImageTag}"
+Invoke-NativeCommand "Building IncidentHub Worker image" {
+    docker build `
+        -f incidenthub-worker/Dockerfile `
+        -t incidenthub-worker:local `
+        .
+}
 
-Write-Host "Pushing API image..."
-docker push "${ApiRepository}:${ImageTag}"
+Invoke-NativeCommand "Tagging API image" {
+    docker tag incidenthub-api:local $ApiImage
+}
 
-Write-Host "Pushing Worker image..."
-docker push "${WorkerRepository}:${ImageTag}"
+Invoke-NativeCommand "Tagging Worker image" {
+    docker tag incidenthub-worker:local $WorkerImage
+}
 
-Write-Host "Done."
+Invoke-NativeCommand "Pushing API image to ECR" {
+    docker push $ApiImage
+}
+
+Invoke-NativeCommand "Pushing Worker image to ECR" {
+    docker push $WorkerImage
+}
+
+Write-Host ""
 Write-Host "Published images:"
-Write-Host "  ${ApiRepository}:${ImageTag}"
-Write-Host "  ${WorkerRepository}:${ImageTag}"
+Write-Host "  $ApiImage"
+Write-Host "  $WorkerImage"
+Write-Host ""
+Write-Host "Done."
