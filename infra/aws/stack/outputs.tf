@@ -113,3 +113,13 @@ output "cloudwatch_log_group_names" {
     worker = aws_cloudwatch_log_group.worker.name
   }
 }
+
+output "ecs_task_execution_role_arn" {
+  description = "IAM role ARN used by ECS to pull images, write logs and read secrets."
+  value       = aws_iam_role.ecs_task_execution.arn
+}
+
+output "ecs_task_role_arn" {
+  description = "IAM role ARN assumed by IncidentHub containers at runtime."
+  value       = aws_iam_role.ecs_task.arn
+}
