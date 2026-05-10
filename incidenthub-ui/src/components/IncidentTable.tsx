@@ -3,9 +3,10 @@ import { StatusBadge } from './StatusBadge'
 
 type IncidentTableProps = {
   incidents: Incident[]
+  onSelectIncident?: (incident: Incident) => void
 }
 
-export function IncidentTable({ incidents }: IncidentTableProps) {
+export function IncidentTable({ incidents, onSelectIncident }: IncidentTableProps) {
   return (
     <div className="table-card">
       <div className="table-card__header">
@@ -26,7 +27,18 @@ export function IncidentTable({ incidents }: IncidentTableProps) {
         </div>
 
         {incidents.map((incident) => (
-          <div className="incident-table__row" key={incident.incidentId}>
+          <div
+            className="incident-table__row incident-table__row--clickable"
+            key={incident.incidentId}
+            role="button"
+            tabIndex={0}
+            onClick={() => onSelectIncident?.(incident)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                onSelectIncident?.(incident)
+              }
+            }}
+          >
             <span>
               <strong>{incident.summary}</strong>
               <small>{incident.environment}</small>

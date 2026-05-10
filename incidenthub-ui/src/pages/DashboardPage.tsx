@@ -9,6 +9,10 @@ import { MetricCard } from '../components/MetricCard'
 import { StatusBadge } from '../components/StatusBadge'
 import type { Incident, OperationalMetric, SloSummary } from '../types/incidenthub'
 
+type DashboardPageProps = {
+  onSelectIncident: (incident: Incident) => void
+}
+
 function findMetric(metrics: OperationalMetric[], name: string): OperationalMetric | undefined {
   return metrics.find((metric) => metric.name === name)
 }
@@ -31,7 +35,7 @@ function formatPercent(value: number | undefined): string {
   return `${formatNumber(value)}%`
 }
 
-export function DashboardPage() {
+export function DashboardPage({ onSelectIncident }: DashboardPageProps) {
   const [incidents, setIncidents] = useState<Incident[]>([])
   const [metrics, setMetrics] = useState<OperationalMetric[]>([])
   const [slos, setSlos] = useState<SloSummary[]>([])
@@ -167,7 +171,7 @@ export function DashboardPage() {
 
       <section className="content-grid">
         {incidents.length > 0 ? (
-          <IncidentTable incidents={incidents} />
+          <IncidentTable incidents={incidents} onSelectIncident={onSelectIncident} />
         ) : (
           <div className="table-card">
             <div className="empty-state">

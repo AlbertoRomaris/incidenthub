@@ -1,4 +1,11 @@
-import type { Incident, OperationalMetric, SloSummary } from '../types/incidenthub'
+import type {
+  Incident,
+  IncidentAlert,
+  IncidentEvidence,
+  IncidentTimelineEvent,
+  OperationalMetric,
+  SloSummary,
+} from '../types/incidenthub'
 
 const API_BASE_URL = '/api'
 
@@ -24,4 +31,20 @@ export async function getOperationalMetrics(): Promise<OperationalMetric[]> {
 export async function getSloSummary(): Promise<SloSummary[]> {
   const response = await getJson<{ slos: SloSummary[] }>('/slo/summary')
   return response.slos
+}
+
+export async function getIncidentTimeline(
+  incidentId: string,
+): Promise<IncidentTimelineEvent[]> {
+  return getJson<IncidentTimelineEvent[]>(`/incidents/${incidentId}/timeline`)
+}
+
+export async function getIncidentEvidence(
+  incidentId: string,
+): Promise<IncidentEvidence[]> {
+  return getJson<IncidentEvidence[]>(`/incidents/${incidentId}/evidence`)
+}
+
+export async function getIncidentAlerts(incidentId: string): Promise<IncidentAlert[]> {
+  return getJson<IncidentAlert[]>(`/incidents/${incidentId}/alerts`)
 }

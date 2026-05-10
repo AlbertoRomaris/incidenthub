@@ -32,3 +32,37 @@ export interface SloSummary {
   unit: string
   status: 'HEALTHY' | 'BREACHED'
 }
+
+export interface IncidentTimelineEvent {
+  eventId: string
+  incidentId: string
+  eventType: string
+  occurredAt: string
+  summary: string
+  actor: string
+  attributes: Record<string, unknown>
+}
+
+export interface IncidentEvidence {
+  evidenceId: string
+  incidentId: string
+  signalId: string
+  ruleId: string
+  capturedAt: string
+  summary: string
+  attributes: Record<string, unknown>
+}
+
+export interface IncidentAlert {
+  alertId: string
+  incidentId: string
+  channel: string
+  status: string
+  title: string
+  message: string
+  createdAt: string
+  sentAt?: string | null
+  failedAt?: string | null
+  failureReason?: string | null
+  attributes: Record<string, unknown>
+}
