@@ -1,10 +1,21 @@
 import type { ReactNode } from 'react'
 
+export type AppView = 'dashboard' | 'incidents' | 'slos' | 'alerts'
+
 type AppLayoutProps = {
   children: ReactNode
+  currentView: AppView
+  onNavigate: (view: AppView) => void
 }
 
-export function AppLayout({ children }: AppLayoutProps) {
+const navItems: Array<{ view: AppView; label: string }> = [
+  { view: 'dashboard', label: 'Dashboard' },
+  { view: 'incidents', label: 'Incidents' },
+  { view: 'slos', label: 'SLOs' },
+  { view: 'alerts', label: 'Alerts' },
+]
+
+export function AppLayout({ children, currentView, onNavigate }: AppLayoutProps) {
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -17,18 +28,20 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
 
         <nav className="sidebar__nav">
-          <a className="sidebar__link sidebar__link--active" href="#">
-            Dashboard
-          </a>
-          <a className="sidebar__link" href="#">
-            Incidents
-          </a>
-          <a className="sidebar__link" href="#">
-            SLOs
-          </a>
-          <a className="sidebar__link" href="#">
-            Alerts
-          </a>
+          {navItems.map((item) => (
+            <button
+              className={
+                currentView === item.view
+                  ? 'sidebar__link sidebar__link--active'
+                  : 'sidebar__link'
+              }
+              key={item.view}
+              type="button"
+              onClick={() => onNavigate(item.view)}
+            >
+              {item.label}
+            </button>
+          ))}
         </nav>
 
         <div className="sidebar__footer">
