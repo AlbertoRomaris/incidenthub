@@ -885,3 +885,157 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== SLOs page ===== */
+
+.slos-page {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+.slo-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.slo-table-card,
+.metric-group-card {
+  overflow: hidden;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+}
+
+.slo-table {
+  display: grid;
+}
+
+.slo-table__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) 0.8fr 0.8fr 0.8fr;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.slo-table__row:last-child {
+  border-bottom: 0;
+}
+
+.slo-table__row--head {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  background: #f8fafc;
+}
+
+.slo-table__row strong {
+  display: block;
+  color: #0f172a;
+}
+
+.slo-table__row small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.slo-side {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.slo-health-list,
+.metric-group-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.slo-health-list div,
+.metric-group-list div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+}
+
+.slo-health-list span,
+.metric-group-list span {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.slo-health-list strong,
+.metric-group-list strong {
+  color: #0f172a;
+}
+
+.metric-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.metric-group-card {
+  padding: 22px;
+}
+
+.metric-list {
+  display: grid;
+  gap: 10px;
+}
+
+.metric-list__item {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.metric-list__item:last-child {
+  border-bottom: 0;
+}
+
+.metric-list__item span {
+  color: #334155;
+  font-weight: 750;
+}
+
+.metric-list__item strong {
+  color: #0f172a;
+  white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+  .slo-layout,
+  .metric-groups-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 840px) {
+  .slo-table__row {
+    grid-template-columns: 1fr;
+  }
+
+  .slo-table__row--head {
+    display: none;
+  }
+
+  .metric-list__item {
+    display: grid;
+  }
+}

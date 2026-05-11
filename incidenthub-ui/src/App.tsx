@@ -3,6 +3,7 @@ import { AppLayout, type AppView } from './components/AppLayout'
 import { DashboardPage } from './pages/DashboardPage'
 import { IncidentDetailPage } from './pages/IncidentDetailPage'
 import { IncidentsPage } from './pages/IncidentsPage'
+import { SlosPage } from './pages/SlosPage'
 import type { Incident } from './types/incidenthub'
 
 function App() {
@@ -28,14 +29,7 @@ function App() {
     }
 
     if (currentView === 'slos') {
-      return (
-        <div className="dashboard-page">
-          <div className="empty-state">
-            <strong>SLOs page coming next</strong>
-            <span>The next V7 step will expose SLO health and operational metrics in a dedicated page.</span>
-          </div>
-        </div>
-      )
+      return <SlosPage />
     }
 
     if (currentView === 'alerts') {
