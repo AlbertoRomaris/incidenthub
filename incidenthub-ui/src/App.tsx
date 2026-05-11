@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AppLayout, type AppView } from './components/AppLayout'
+import { AlertsPage } from './pages/AlertsPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { IncidentDetailPage } from './pages/IncidentDetailPage'
 import { IncidentsPage } from './pages/IncidentsPage'
@@ -33,14 +34,7 @@ function App() {
     }
 
     if (currentView === 'alerts') {
-      return (
-        <div className="dashboard-page">
-          <div className="empty-state">
-            <strong>Alerts page coming next</strong>
-            <span>The next V7 step will list delivered and failed alert notifications.</span>
-          </div>
-        </div>
-      )
+      return <AlertsPage onSelectIncident={openIncident} />
     }
 
     return <DashboardPage onSelectIncident={openIncident} />

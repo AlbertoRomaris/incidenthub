@@ -19,4 +19,6 @@ public interface AlertRepository {
     List<Alert> findPending(int limit);
 
     long countByStatus(AlertStatus status);
+
+    List<Alert> findRecent(int limit);
 }

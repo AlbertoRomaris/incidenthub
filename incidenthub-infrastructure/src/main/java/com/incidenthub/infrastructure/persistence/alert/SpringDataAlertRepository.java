@@ -14,4 +14,6 @@ interface SpringDataAlertRepository extends JpaRepository<AlertEntity, UUID> {
     List<AlertEntity> findByStatus(AlertStatus status, Pageable pageable);
 
     long countByStatus(AlertStatus status);
+
+    List<AlertEntity> findAllByOrderByCreatedAtDesc(Pageable pageable);
 }

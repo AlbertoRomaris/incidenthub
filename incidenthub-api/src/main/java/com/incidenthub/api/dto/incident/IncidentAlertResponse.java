@@ -1,5 +1,6 @@
 package com.incidenthub.api.dto.incident;
 
+import com.incidenthub.core.domain.alert.Alert;
 import com.incidenthub.core.domain.alert.AlertChannel;
 import com.incidenthub.core.domain.alert.AlertStatus;
 
@@ -19,4 +20,20 @@ public record IncidentAlertResponse(
         String failureReason,
         Map<String, Object> attributes
 ) {
+
+    public static IncidentAlertResponse from(Alert alert) {
+        return new IncidentAlertResponse(
+                alert.id().value().toString(),
+                alert.incidentId().value().toString(),
+                alert.channel(),
+                alert.status(),
+                alert.title(),
+                alert.message(),
+                alert.createdAt(),
+                alert.sentAt(),
+                alert.failedAt(),
+                alert.failureReason(),
+                alert.attributes()
+        );
+    }
 }

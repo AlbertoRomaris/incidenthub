@@ -20,4 +20,9 @@ public class ListIncidentAlertsUseCase {
 
         return alertRepository.findByIncidentId(incidentId);
     }
+
+    public List<Alert> findRecent(int limit) {
+        int safeLimit = Math.max(1, Math.min(limit, 200));
+        return alertRepository.findRecent(safeLimit);
+    }
 }

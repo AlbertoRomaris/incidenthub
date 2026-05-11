@@ -48,3 +48,7 @@ export async function getIncidentEvidence(
 export async function getIncidentAlerts(incidentId: string): Promise<IncidentAlert[]> {
   return getJson<IncidentAlert[]>(`/incidents/${incidentId}/alerts`)
 }
+
+export async function getAlerts(limit = 100): Promise<IncidentAlert[]> {
+  return getJson<IncidentAlert[]>(`/alerts?limit=${limit}`)
+}
