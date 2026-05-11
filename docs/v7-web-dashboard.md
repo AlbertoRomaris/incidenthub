@@ -97,6 +97,30 @@ incidenthub-ui/
 
 ---
 
+## Screenshots
+
+### Dashboard
+
+![IncidentHub Dashboard](assets/01-dashboard.jpg)
+
+### Incidents
+
+![IncidentHub Incidents](assets/02-incidents.jpg)
+
+### Incident Detail
+
+![IncidentHub Incident Detail](assets/03-incident-detail.jpg)
+
+### SLOs & Metrics
+
+![IncidentHub SLOs and Metrics](assets/04-slos-metrics.jpg)
+
+### Alerts
+
+![IncidentHub Alerts](assets/05-alerts.jpg)
+
+---
+
 ## Frontend Architecture
 
 The UI is intentionally simple and focused.
